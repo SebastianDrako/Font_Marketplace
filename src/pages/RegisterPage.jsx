@@ -11,7 +11,7 @@ const PageContainer = styled.div`
   background-color: #f0f2f5;
 `;
 
-const LoginCard = styled.div`
+const RegisterCard = styled.div`
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -84,25 +84,68 @@ const Form = styled.form`
   }
 `;
 
-const LoginPage = () => {
+const ErrorMessage = styled.p`
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+`;
+
+const RegisterPage = () => {
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
+  const [confirmEmail, setConfirmEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, loading } = useAuth();
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [error, setError] = useState('');
+  const { register, loading } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const success = await login(email, password);
+    if (email !== confirmEmail) {
+      setError('Los correos electrónicos no coinciden');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Las contraseñas no coinciden');
+      return;
+    }
+    setError('');
+    const success = await register(firstName, lastName, email, password);
     if (success) {
-      navigate('/'); // Redirect on successful login
+      navigate('/login');
+    } else {
+      // Handle registration error
+      alert('Registration failed');
     }
   };
 
   return (
     <PageContainer>
-      <LoginCard>
-        <Title>Iniciar Sesión</Title>
+      <RegisterCard>
+        <Title>Crear Cuenta</Title>
         <Form onSubmit={handleSubmit}>
+          <div className="form-group">
+            <label htmlFor="firstName">Nombre</label>
+            <input
+              id="firstName"
+              type="text"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="lastName">Apellido</label>
+            <input
+              id="lastName"
+              type="text"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+              required
+            />
+          </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -110,6 +153,16 @@ const LoginPage = () => {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label htmlFor="confirmEmail">Confirmar Email</label>
+            <input
+              id="confirmEmail"
+              type="email"
+              value={confirmEmail}
+              onChange={(e) => setConfirmEmail(e.target.value)}
               required
             />
           </div>
@@ -123,13 +176,24 @@ const LoginPage = () => {
               required
             />
           </div>
+          <div className="form-group">
+            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
+            <input
+              id="confirmPassword"
+              type="password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              required
+            />
+          </div>
+          {error && <ErrorMessage>{error}</ErrorMessage>}
           <button type="submit" disabled={loading}>
-            {loading ? 'Ingresando...' : 'Ingresar'}
+            {loading ? 'Registrando...' : 'Registrarse'}
           </button>
         </Form>
-      </LoginCard>
+      </RegisterCard>
     </PageContainer>
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

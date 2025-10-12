@@ -1,8 +1,7 @@
 
 import axios from 'axios';
 
-// Define the base URL for the API
-const API_BASE_URL = 'https://api.example.com/api'; // Reemplaza esto con la URL de tu API
+const API_BASE_URL = 'http://23.95.3.178:8080'; // Reemplaza esto con la URL de tu API
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
