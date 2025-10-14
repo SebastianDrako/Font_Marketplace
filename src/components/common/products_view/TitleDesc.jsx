@@ -1,11 +1,11 @@
 import React from 'react';
 
-const TitleDesc = () => {
+const TitleDesc = ({ title = 'Nombre no disponible', description = 'Sin descripción.' }) => {
   return (
     <>
-      <h1 className="display-5">Título del Producto</h1>
+      <h1 className="display-5">{title}</h1>
       <p className="lead">
-        Aquí va una descripción detallada y atractiva del producto. Puedes hablar de sus características, beneficios y por qué es la mejor opción para el cliente.
+        {description}
       </p>
     </>
   );

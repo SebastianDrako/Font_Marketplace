@@ -1,15 +1,25 @@
 import React, { useState } from 'react';
 import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
 
-const AddToCart = () => {
+const AddToCart = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
 
   const handleIncrement = () => {
+    // Opcional: se podría añadir una comprobación contra product.stock
     setQuantity(prevQuantity => prevQuantity + 1);
   };
 
   const handleDecrement = () => {
     setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  };
+
+  const handleAddToCart = () => {
+    console.log(`[AddToCart] Producto añadido al carrito:`);
+    console.log(`  - ID del Producto: ${product.id}`);
+    console.log(`  - Nombre: ${product.name}`);
+    console.log(`  - Cantidad: ${quantity}`);
+    // Aquí iría la lógica para añadir al estado global del carrito (ej: Redux, Context)
+    alert(`Añadido al carrito: ${quantity} x ${product.name}`);
   };
 
   return (
@@ -32,7 +42,7 @@ const AddToCart = () => {
       </Col>
       <Col lg={7} md={12} sm={6}>
         <div className="d-grid">
-          <Button variant="primary" size="lg">
+          <Button variant="primary" size="lg" onClick={handleAddToCart} disabled={!product}>
             <i className="bi bi-cart-plus-fill me-2"></i>Agregar al carrito
           </Button>
         </div>
