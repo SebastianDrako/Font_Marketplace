@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { useCart } from '../../../hooks/useCart';
 
 const AddToCart = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
 
   const handleIncrement = () => {
     // Opcional: se podría añadir una comprobación contra product.stock
@@ -14,12 +16,7 @@ const AddToCart = ({ product }) => {
   };
 
   const handleAddToCart = () => {
-    console.log(`[AddToCart] Producto añadido al carrito:`);
-    console.log(`  - ID del Producto: ${product.id}`);
-    console.log(`  - Nombre: ${product.name}`);
-    console.log(`  - Cantidad: ${quantity}`);
-    // Aquí iría la lógica para añadir al estado global del carrito (ej: Redux, Context)
-    alert(`Añadido al carrito: ${quantity} x ${product.name}`);
+    addToCart(product, quantity);
   };
 
   return (
