@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom';
 const CartPage = () => {
     const { cart, removeFromCart, decrementQuantity, addToCart, clearCart } = useCart();
 
-    const total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
+    const subtotal = cart.reduce((acc, item) => acc + (item.lineTotal || item.price * item.quantity), 0);
 
     if (cart.length === 0) {
         return (
@@ -47,11 +47,11 @@ const CartPage = () => {
                             <ListGroup variant="flush">
                                 <ListGroup.Item className="d-flex justify-content-between">
                                     <span>Subtotal</span>
-                                    <span>${total.toFixed(2)}</span>
+                                    <span>${subtotal.toFixed(2)}</span>
                                 </ListGroup.Item>
                                 <ListGroup.Item className="d-flex justify-content-between">
                                     <strong>Total</strong>
-                                    <strong>${total.toFixed(2)}</strong>
+                                    <strong>${subtotal.toFixed(2)}</strong>
                                 </ListGroup.Item>
                             </ListGroup>
                             <div className="d-grid gap-2 mt-3">
