@@ -1,12 +1,21 @@
 import React from 'react';
 import { Breadcrumb } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
-const BreadCrumb = () => {
+const BreadCrumb = ({ path = [], productName = '' }) => {
   return (
     <Breadcrumb>
-      <Breadcrumb.Item href="#">Categoría Principal</Breadcrumb.Item>
-      <Breadcrumb.Item href="#">Subcategoría 1</Breadcrumb.Item>
-      <Breadcrumb.Item active>Título del Producto</Breadcrumb.Item>
+      <Breadcrumb.Item linkAs={Link} linkProps={{ to: "/" }}>Inicio</Breadcrumb.Item>
+      {path.map(category => (
+        <Breadcrumb.Item 
+          key={category.id} 
+          linkAs={Link} 
+          linkProps={{ to: `/category/${category.id}` }}
+        >
+          {category.name}
+        </Breadcrumb.Item>
+      ))}
+      <Breadcrumb.Item active>{productName}</Breadcrumb.Item>
     </Breadcrumb>
   );
 };

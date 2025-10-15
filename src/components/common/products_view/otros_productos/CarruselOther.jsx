@@ -2,53 +2,45 @@ import React from 'react';
 import { Carousel, Row, Col } from 'react-bootstrap';
 import Card from './Card';
 
-const CarruselOther = () => {
+// Función para dividir el array de productos en grupos de un tamaño específico
+const chunk = (arr, size) =>
+  Array.from({ length: Math.ceil(arr.length / size) }, (v, i) =>
+    arr.slice(i * size, i * size + size)
+  );
+
+const CarruselOther = ({ products = [] }) => {
+  // Si no hay productos, no renderizar nada
+  if (!products || products.length === 0) {
+    return null;
+  }
+
+  // Agrupamos los productos de 3 en 3 para cada slide del carrusel
+  const productChunks = chunk(products, 3);
+
   return (
-    <Carousel indicators={false}>
-      <Carousel.Item>
-        <Row>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/adb5bd/495057?text=Producto+A"
-              title="Nombre del Producto A"
-            />
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/6c757d/ffffff?text=Producto+B"
-              title="Nombre del Producto B"
-            />
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/495057/ffffff?text=Producto+C"
-              title="Nombre del Producto C"
-            />
-          </Col>
-        </Row>
-      </Carousel.Item>
-      <Carousel.Item>
-        <Row>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/343a40/ffffff?text=Producto+D"
-              title="Nombre del Producto D"
-            />
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/ced4da/495057?text=Producto+E"
-              title="Nombre del Producto E"
-            />
-          </Col>
-          <Col md={4} className="mb-3">
-            <Card
-              imageUrl="https://placehold.co/600x400/212529/ffffff?text=Producto+F"
-              title="Nombre del Producto F"
-            />
-          </Col>
-        </Row>
-      </Carousel.Item>
+    <Carousel indicators={productChunks.length > 1} controls={productChunks.length > 1}>
+      {productChunks.map((chunk, index) => (
+        <Carousel.Item key={index}>
+          <Row>
+            {chunk.map((product) => {
+              // Obtenemos el ID de la primera imagen.
+              const imageId = product.imageIds && product.imageIds.length > 0
+                ? product.imageIds[0]
+                : null;
+
+              return (
+                <Col md={4} className="mb-3" key={product.id}>
+                  <Card
+                    productId={product.id}
+                    imageId={imageId} // Pasamos el ID de la imagen
+                    title={product.name}
+                  />
+                </Col>
+              );
+            })}
+          </Row>
+        </Carousel.Item>
+      ))}
     </Carousel>
   );
 };

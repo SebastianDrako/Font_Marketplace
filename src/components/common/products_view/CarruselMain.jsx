@@ -1,30 +1,25 @@
 import React from 'react';
 import { Carousel } from 'react-bootstrap';
+import AuthImage from '../AuthImage';
 
-const CarruselMain = () => {
+const CarruselMain = ({ imageIds = [] }) => {
+  if (imageIds.length === 0) {
+    return (
+      <AuthImage imageId={null} alt="Producto sin imagen" className="d-block w-100" />
+    );
+  }
+
   return (
     <Carousel>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://placehold.co/800x600/E9ECEF/495057?text=Imagen+1"
-          alt="Imagen de producto 1"
-        />
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://placehold.co/800x600/6C757D/FFFFFF?text=Imagen+2"
-          alt="Imagen de producto 2"
-        />
-      </Carousel.Item>
-      <Carousel.Item>
-        <img
-          className="d-block w-100"
-          src="https://placehold.co/800x600/343A40/FFFFFF?text=Imagen+3"
-          alt="Imagen de producto 3"
-        />
-      </Carousel.Item>
+      {imageIds.map((id, index) => (
+        <Carousel.Item key={id}>
+          <AuthImage 
+            imageId={id} 
+            alt={`Imagen de producto ${index + 1}`} 
+            className="d-block w-100"
+          />
+        </Carousel.Item>
+      ))}
     </Carousel>
   );
 };

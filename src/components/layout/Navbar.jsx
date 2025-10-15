@@ -1,8 +1,8 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Navbar, Nav, Container, NavDropdown } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth.jsx';
+import CartWidget from '../common/CartWidget.jsx';
 
 const AppNavbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
@@ -18,9 +18,12 @@ const AppNavbar = () => {
           </Nav>
           <Nav>
             {isAuthenticated ? (
-              <NavDropdown title={user?.name} id="basic-nav-dropdown">
-                <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-              </NavDropdown>
+              <>
+                <CartWidget />
+                <NavDropdown title={user?.name} id="basic-nav-dropdown">
+                  <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
+                </NavDropdown>
+              </>
             ) : (
               <>
                 <Nav.Link as={Link} to="/login">Login</Nav.Link>

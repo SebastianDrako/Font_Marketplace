@@ -1,15 +1,22 @@
 import React, { useState } from 'react';
 import { Row, Col, Form, InputGroup, Button } from 'react-bootstrap';
+import { useCart } from '../../../hooks/useCart';
 
-const AddToCart = () => {
+const AddToCart = ({ product }) => {
   const [quantity, setQuantity] = useState(1);
+  const { addToCart } = useCart();
 
   const handleIncrement = () => {
+    // Opcional: se podría añadir una comprobación contra product.stock
     setQuantity(prevQuantity => prevQuantity + 1);
   };
 
   const handleDecrement = () => {
     setQuantity(prevQuantity => (prevQuantity > 1 ? prevQuantity - 1 : 1));
+  };
+
+  const handleAddToCart = () => {
+    addToCart(product, quantity);
   };
 
   return (
@@ -32,7 +39,7 @@ const AddToCart = () => {
       </Col>
       <Col lg={7} md={12} sm={6}>
         <div className="d-grid">
-          <Button variant="primary" size="lg">
+          <Button variant="primary" size="lg" onClick={handleAddToCart} disabled={!product}>
             <i className="bi bi-cart-plus-fill me-2"></i>Agregar al carrito
           </Button>
         </div>
