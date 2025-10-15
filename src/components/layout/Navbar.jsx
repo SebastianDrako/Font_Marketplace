@@ -29,6 +29,7 @@ const AppNavbar = () => {
               </>
             ) : (
               <>
+                <Nav.Link as={Link} to="/Catalog">Catalogo</Nav.Link>
                 <Nav.Link as={Link} to="/login">Login</Nav.Link>
                 <Nav.Link as={Link} to="/register">Register</Nav.Link>
               </>

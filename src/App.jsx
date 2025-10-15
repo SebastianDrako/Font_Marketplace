@@ -14,6 +14,7 @@ import OtpPage from './pages/OtpPage';
 import AdminProductsPage from './pages/AdminProductsPage';
 import './styles/App.css';
 import CheckoutPage from './pages/CheckoutPage';
+import CatalogPage from './pages/CatalogPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
         <main className="flex-grow-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/Catalog" element={<CatalogPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
             <Route path="/otp" element={<OtpPage />} />
