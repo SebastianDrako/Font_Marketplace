@@ -15,6 +15,8 @@ import AdminProductsPage from './pages/AdminProductsPage';
 import './styles/App.css';
 import CheckoutPage from './pages/CheckoutPage';
 
+import AdminRoute from './components/routes/AdminRoute';
+
 function App() {
   return (
     <Router>
@@ -29,10 +31,12 @@ function App() {
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/orders" element={<AdminOrdersPage />} />
-            <Route path="/admin/products" element={<AdminProductsPage />} />
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/orders" element={<AdminOrdersPage />} />
+              <Route path="/admin/products" element={<AdminProductsPage />} />
+            </Route>
           </Routes>
         </main>
         <Footer />
