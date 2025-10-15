@@ -10,7 +10,14 @@ const AppNavbar = () => {
   return (
     <Navbar bg="light" expand="lg" sticky="top">
       <Container fluid>
-        <Navbar.Brand as={Link} to="/">Marketplace</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">
+          <img
+            src="https://placehold.co/120x30/png?text=Logo"
+            height="30"
+            className="d-inline-block align-top"
+            alt="Logo de la tienda"
+          />
+        </Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
