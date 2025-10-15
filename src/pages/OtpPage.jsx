@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { useAuth } from '../hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
+import apiClient from '../services/apiClient';
 
 const PageContainer = styled.div`
   display: flex;
@@ -11,7 +11,7 @@ const PageContainer = styled.div`
   background-color: #f0f2f5;
 `;
 
-const RegisterCard = styled.div`
+const OtpCard = styled.div`
   padding: 2.5rem;
   border-radius: 12px;
   box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
@@ -88,64 +88,38 @@ const ErrorMessage = styled.p`
   color: #dc3545;
   font-size: 0.875rem;
   margin-top: 0.25rem;
+  text-align: center;
 `;
 
-const RegisterPage = () => {
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+const OtpPage = () => {
   const [email, setEmail] = useState('');
-  const [confirmEmail, setConfirmEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
+  const [otp, setOtp] = useState('');
   const [error, setError] = useState('');
-  const { register, loading } = useAuth();
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (email !== confirmEmail) {
-      setError('Los correos electrónicos no coinciden');
-      return;
-    }
-    if (password !== confirmPassword) {
-      setError('Las contraseñas no coinciden');
-      return;
-    }
     setError('');
-    const success = await register(firstName, lastName, email, password);
-    if (success) {
-      navigate('/otp');
-    } else {
-      // Handle registration error
-      alert('Registration failed');
+    setLoading(true);
+
+    try {
+      await apiClient.post('/api/v1/auth/activate', { email, otp });
+      // On success, redirect to the login page
+      navigate('/login');
+    } catch (err) {
+      setError('Failed to activate account. Please check your email and OTP.');
+      console.error('Activation failed:', err);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <PageContainer>
-      <RegisterCard>
-        <Title>Crear Cuenta</Title>
+      <OtpCard>
+        <Title>Verificar Cuenta</Title>
         <Form onSubmit={handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="firstName">Nombre</label>
-            <input
-              id="firstName"
-              type="text"
-              value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="lastName">Apellido</label>
-            <input
-              id="lastName"
-              type="text"
-              value={lastName}
-              onChange={(e) => setLastName(e.target.value)}
-              required
-            />
-          </div>
           <div className="form-group">
             <label htmlFor="email">Email</label>
             <input
@@ -157,43 +131,23 @@ const RegisterPage = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmEmail">Confirmar Email</label>
+            <label htmlFor="otp">OTP</label>
             <input
-              id="confirmEmail"
-              type="email"
-              value={confirmEmail}
-              onChange={(e) => setConfirmEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Contraseña</label>
-            <input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="confirmPassword">Confirmar Contraseña</label>
-            <input
-              id="confirmPassword"
-              type="password"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
+              id="otp"
+              type="text"
+              value={otp}
+              onChange={(e) => setOtp(e.target.value)}
               required
             />
           </div>
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <button type="submit" disabled={loading}>
-            {loading ? 'Registrando...' : 'Registrarse'}
+            {loading ? 'Verificando...' : 'Verificar'}
           </button>
         </Form>
-      </RegisterCard>
+      </OtpCard>
     </PageContainer>
   );
 };
 
-export default RegisterPage;
+export default OtpPage;
