@@ -22,7 +22,8 @@ const AppNavbar = () => {
                 <CartWidget />
                 <NavDropdown title={user?.name} id="basic-nav-dropdown">
                   <NavDropdown.Item onClick={logout}>Logout</NavDropdown.Item>
-                  {user?.role === 'ADMIN' && (
+                  <NavDropdown.Item as={Link} to="/profile">My Profile</NavDropdown.Item>
+                  {user?.roles?.includes('ADMIN') && (
                   <NavDropdown.Item as={Link} to="/admin" variant="danger">Administración</NavDropdown.Item>
                 )}
                 </NavDropdown>
