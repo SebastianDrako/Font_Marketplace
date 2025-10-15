@@ -62,7 +62,7 @@ const AdminUsersPage = () => {
     setShowOtpModal(true);
     setOtpLoading(true);
     try {
-      const response = await apiClient.get(`/api/v1/admin/users/${userId}/regenerate-otp`);
+      const response = await apiClient.post(`/api/v1/admin/users/${userId}/regenerate-otp`);
       setOtp(response.data.otp);
     } catch (err) {
       setOtpError('Failed to regenerate OTP.');
