@@ -27,7 +27,7 @@ const AdminUsersPage = () => {
       const response = await apiClient.get('/api/v1/admin/users');
       setUsers(response.data);
     } catch (err) {
-      setError('Failed to fetch users. Please try again later.');
+      setError('Error al cargar los usuarios. Por favor, inténtalo de nuevo más tarde.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -51,7 +51,7 @@ const AdminUsersPage = () => {
       const response = await apiClient.get(`/api/v1/admin/users/${userId}/otp`);
       setOtp(response.data.otp);
     } catch (err) {
-      setOtpError('Failed to fetch OTP.');
+      setOtpError('Error al obtener el OTP.');
       console.error(err);
     } finally {
       setOtpLoading(false);
@@ -65,7 +65,7 @@ const AdminUsersPage = () => {
       const response = await apiClient.post(`/api/v1/admin/users/${userId}/regenerate-otp`);
       setOtp(response.data.otp);
     } catch (err) {
-      setOtpError('Failed to regenerate OTP.');
+      setOtpError('Error al regenerar el OTP.');
       console.error(err);
     } finally {
       setOtpLoading(false);
@@ -111,25 +111,25 @@ const AdminUsersPage = () => {
   };
 
   const handleUpgrade = async (userId) => {
-    if (window.confirm('Are you sure you want to upgrade this user to ADMIN?')) {
+    if (window.confirm('¿Estás seguro de que quieres ascender a este usuario a ADMIN?')) {
       try {
         await apiClient.post(`/api/v1/users/${userId}/upgrade`);
         fetchUsers();
       } catch (err) {
-        console.error('Failed to upgrade user', err);
-        alert('Failed to upgrade user.');
+        console.error('Error al ascender al usuario', err);
+        alert('Error al ascender al usuario.');
       }
     }
   };
 
   const handleDowngrade = async (userId) => {
-    if (window.confirm('Are you sure you want to downgrade this user to USER?')) {
+    if (window.confirm('¿Estás seguro de que quieres degradar a este usuario a USER?')) {
       try {
         await apiClient.post(`/api/v1/users/${userId}/downgrade`);
         fetchUsers();
       } catch (err) {
-        console.error('Failed to downgrade user', err);
-        alert('Failed to downgrade user.');
+        console.error('Error al degradar al usuario', err);
+        alert('Error al degradar al usuario.');
       }
     }
   };
@@ -137,10 +137,10 @@ const AdminUsersPage = () => {
   const renderStatus = (user) => (
     <>
       <Badge bg={user.isActive ? 'success' : 'secondary'} className="me-1">
-        {user.isActive ? 'Active' : 'Inactive'}
+        {user.isActive ? 'Activo' : 'Inactivo'}
       </Badge>
       <Badge bg={user.isEmailConfirmed ? 'primary' : 'warning'}>
-        {user.isEmailConfirmed ? 'Verified' : 'Not Verified'}
+        {user.isEmailConfirmed ? 'Verificado' : 'No Verificado'}
       </Badge>
     </>
   );
@@ -150,14 +150,14 @@ const AdminUsersPage = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Administrar Usuarios</h1>
         <LinkContainer to="/admin">
-          <Button variant="secondary">Back to Admin Menu</Button>
+          <Button variant="secondary">Volver al Menú de Administrador</Button>
         </LinkContainer>
       </div>
 
       {loading && (
         <div className="text-center">
           <Spinner animation="border" role="status">
-            <span className="visually-hidden">Loading...</span>
+            <span className="visually-hidden">Cargando...</span>
           </Spinner>
         </div>
       )}
@@ -169,12 +169,12 @@ const AdminUsersPage = () => {
           <thead>
             <tr>
               <th>#</th>
-              <th>First Name</th>
-              <th>Last Name</th>
-              <th>Email</th>
-              <th>Role</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <th>Nombre</th>
+              <th>Apellido</th>
+              <th>Correo</th>
+              <th>Rol</th>
+              <th>Estado</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -188,14 +188,14 @@ const AdminUsersPage = () => {
                 <td>{renderStatus(user)}</td>
                 <td>
                   <ButtonGroup>
-                    <Button variant="outline-primary" size="sm" onClick={() => handleEditClick(user)}>Edit</Button>
-                    <Button variant="outline-info" size="sm" onClick={() => handleShowOtp(user.userId)}>Show OTP</Button>
-                    <Button variant="outline-warning" size="sm" onClick={() => handleRegenerateOtp(user.userId)}>Regen OTP</Button>
+                    <Button variant="outline-primary" size="sm" onClick={() => handleEditClick(user)}>Editar</Button>
+                    <Button variant="outline-info" size="sm" onClick={() => handleShowOtp(user.userId)}>Ver OTP</Button>
+                    <Button variant="outline-warning" size="sm" onClick={() => handleRegenerateOtp(user.userId)}>Regenerar OTP</Button>
                     {user.authLevel === 'USER' && (
-                      <Button variant="success" size="sm" onClick={() => handleUpgrade(user.userId)} disabled={currentUser?.userId === user.userId}>Upgrade</Button>
+                      <Button variant="success" size="sm" onClick={() => handleUpgrade(user.userId)} disabled={currentUser?.userId === user.userId}>Ascender</Button>
                     )}
                     {user.authLevel === 'ADMIN' && (
-                      <Button variant="danger" size="sm" onClick={() => handleDowngrade(user.userId)} disabled={currentUser?.userId === user.userId}>Downgrade</Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDowngrade(user.userId)} disabled={currentUser?.userId === user.userId}>Degradar</Button>
                     )}
                   </ButtonGroup>
                 </td>
@@ -208,25 +208,25 @@ const AdminUsersPage = () => {
       {/* OTP Modal */}
       <Modal show={showOtpModal} onHide={handleCloseOtpModal} centered>
         <Modal.Header closeButton>
-          <Modal.Title>User OTP</Modal.Title>
+          <Modal.Title>OTP del Usuario</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center">
           {otpLoading && (
             <Spinner animation="border" role="status">
-              <span className="visually-hidden">Loading...</span>
+              <span className="visually-hidden">Cargando...</span>
             </Spinner>
           )}
           {otpError && <Alert variant="danger">{otpError}</Alert>}
           {otp && !otpError && (
             <>
-              <p>The One-Time Password is:</p>
+              <p>El código de un solo uso es:</p>
               <h3 className="user-select-all">{otp}</h3>
             </>
           )}
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseOtpModal}>
-            Close
+            Cerrar
           </Button>
         </Modal.Footer>
       </Modal>
@@ -235,39 +235,39 @@ const AdminUsersPage = () => {
       {editingUser && (
         <Modal show={showEditModal} onHide={() => setShowEditModal(false)} centered>
           <Modal.Header closeButton>
-            <Modal.Title>Edit User: {editingUser.firstName} {editingUser.lastName}</Modal.Title>
+            <Modal.Title>Editar Usuario: {editingUser.firstName} {editingUser.lastName}</Modal.Title>
           </Modal.Header>
           <Form onSubmit={handleUpdateUser}>
             <Modal.Body>
               <Form.Group className="mb-3">
-                <Form.Label>First Name</Form.Label>
+                <Form.Label>Nombre</Form.Label>
                 <Form.Control type="text" name="firstName" value={editFormData.firstName} onChange={handleEditFormChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Last Name</Form.Label>
+                <Form.Label>Apellido</Form.Label>
                 <Form.Control type="text" name="lastName" value={editFormData.lastName} onChange={handleEditFormChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>Correo Electrónico</Form.Label>
                 <Form.Control type="email" name="mail" value={editFormData.mail} onChange={handleEditFormChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Label>Password</Form.Label>
-                <Form.Control type="password" name="password" placeholder="Leave blank to keep current password" value={editFormData.password} onChange={handleEditFormChange} />
+                <Form.Label>Contraseña</Form.Label>
+                <Form.Control type="password" name="password" placeholder="Dejar en blanco para mantener la contraseña actual" value={editFormData.password} onChange={handleEditFormChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Check type="switch" label="Is Enabled" name="isEnabled" checked={editFormData.isEnabled} onChange={handleEditFormChange} />
+                <Form.Check type="switch" label="Habilitado" name="isEnabled" checked={editFormData.isEnabled} onChange={handleEditFormChange} />
               </Form.Group>
               <Form.Group className="mb-3">
-                <Form.Check type="switch" label="Email Confirmed" name="isEmailConfirmed" checked={editFormData.isEmailConfirmed} onChange={handleEditFormChange} />
+                <Form.Check type="switch" label="Correo Confirmado" name="isEmailConfirmed" checked={editFormData.isEmailConfirmed} onChange={handleEditFormChange} />
               </Form.Group>
             </Modal.Body>
             <Modal.Footer>
               <Button variant="secondary" onClick={() => setShowEditModal(false)}>
-                Cancel
+                Cancelar
               </Button>
               <Button variant="primary" type="submit">
-                Save Changes
+                Guardar Cambios
               </Button>
             </Modal.Footer>
           </Form>

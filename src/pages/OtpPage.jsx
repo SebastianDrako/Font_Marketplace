@@ -108,7 +108,7 @@ const OtpPage = () => {
       // On success, redirect to the login page
       navigate('/login');
     } catch (err) {
-      setError('Failed to activate account. Please check your email and OTP.');
+      setError('Error al activar la cuenta. Por favor, revisa tu correo electrónico y código OTP.');
       console.error('Activation failed:', err);
     } finally {
       setLoading(false);
@@ -121,7 +121,7 @@ const OtpPage = () => {
         <Title>Verificar Cuenta</Title>
         <Form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
               id="email"
               type="email"

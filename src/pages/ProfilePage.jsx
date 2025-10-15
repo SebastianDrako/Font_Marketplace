@@ -10,13 +10,13 @@ const ProfilePage = () => {
         <Col md={3}>
           <Nav variant="pills" className="flex-column">
             <LinkContainer to="/profile/info">
-              <Nav.Link>My Information</Nav.Link>
+              <Nav.Link>Mi Información</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/profile/addresses">
-              <Nav.Link>My Addresses</Nav.Link>
+              <Nav.Link>Mis Direcciones</Nav.Link>
             </LinkContainer>
             <LinkContainer to="/profile/orders">
-              <Nav.Link>My Orders</Nav.Link>
+              <Nav.Link>Mis Pedidos</Nav.Link>
             </LinkContainer>
           </Nav>
         </Col>

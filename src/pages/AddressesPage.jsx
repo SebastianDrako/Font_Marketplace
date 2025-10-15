@@ -16,7 +16,7 @@ const AddressesPage = () => {
       const response = await addressService.getAddresses();
       setAddresses(response.data);
     } catch (err) {
-      setError('Failed to fetch addresses.');
+      setError('Error al cargar las direcciones.');
     } finally {
       setLoading(false);
     }
@@ -53,28 +53,28 @@ const AddressesPage = () => {
       fetchAddresses();
       handleCloseModal();
     } catch (err) {
-      setError('Failed to save address.');
+      setError('Error al guardar la dirección.');
     }
   };
 
   const handleDelete = async (addressId) => {
-    if (window.confirm('Are you sure you want to delete this address?')) {
+    if (window.confirm('¿Estás seguro de que quieres eliminar esta dirección?')) {
       try {
         await addressService.deleteAddress(addressId);
         fetchAddresses();
       } catch (err) {
-        setError('Failed to delete address.');
+        setError('Error al eliminar la dirección.');
       }
     }
   };
 
   return (
     <Card>
-      <Card.Header as="h2">My Addresses</Card.Header>
+      <Card.Header as="h2">Mis Direcciones</Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         <Button variant="primary" onClick={() => handleShowModal()} className="mb-3">
-          Add New Address
+          Añadir Nueva Dirección
         </Button>
         {loading ? (
           <Spinner animation="border" />
@@ -89,45 +89,45 @@ const AddressesPage = () => {
                   {addr.others && <><br/><em>{addr.others}</em></>}
                 </div>
                 <div>
-                  <Button variant="outline-secondary" size="sm" onClick={() => handleShowModal(addr)} className="me-2">Edit</Button>
-                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(addr.addressId)}>Delete</Button>
+                  <Button variant="outline-secondary" size="sm" onClick={() => handleShowModal(addr)} className="me-2">Editar</Button>
+                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(addr.addressId)}>Eliminar</Button>
                 </div>
               </ListGroup.Item>
             ))}
           </ListGroup>
         ) : (
-          <p>You have no saved addresses.</p>
+          <p>No tienes direcciones guardadas.</p>
         )}
       </Card.Body>
 
       <Modal show={showModal} onHide={handleCloseModal}>
         <Modal.Header closeButton>
-          <Modal.Title>{selectedAddress ? 'Edit Address' : 'Add New Address'}</Modal.Title>
+          <Modal.Title>{selectedAddress ? 'Editar Dirección' : 'Añadir Nueva Dirección'}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleFormSubmit}>
             <Form.Group className="mb-3" controlId="name">
-              <Form.Label>Address Name (e.g., Home, Work)</Form.Label>
+              <Form.Label>Nombre de la Dirección (ej. Casa, Trabajo)</Form.Label>
               <Form.Control type="text" name="name" value={formData.name} onChange={handleFormChange} required />
             </Form.Group>
             <Form.Group className="mb-3" controlId="street">
-              <Form.Label>Street</Form.Label>
+              <Form.Label>Calle</Form.Label>
               <Form.Control type="text" name="street" value={formData.street} onChange={handleFormChange} required />
             </Form.Group>
             <Form.Group className="mb-3" controlId="apt">
-              <Form.Label>Apartment, suite, etc.</Form.Label>
+              <Form.Label>Apartamento, piso, etc.</Form.Label>
               <Form.Control type="text" name="apt" value={formData.apt} onChange={handleFormChange} />
             </Form.Group>
             <Form.Group className="mb-3" controlId="postalCode">
-              <Form.Label>Postal Code</Form.Label>
+              <Form.Label>Código Postal</Form.Label>
               <Form.Control type="text" name="postalCode" value={formData.postalCode} onChange={handleFormChange} required />
             </Form.Group>
             <Form.Group className="mb-3" controlId="others">
-              <Form.Label>Other details (optional)</Form.Label>
+              <Form.Label>Otros detalles (opcional)</Form.Label>
               <Form.Control as="textarea" rows={2} name="others" value={formData.others} onChange={handleFormChange} />
             </Form.Group>
-            <Button variant="primary" type="submit">Save Address</Button>
+            <Button variant="primary" type="submit">Guardar Dirección</Button>
           </Form>
         </Modal.Body>
       </Modal>

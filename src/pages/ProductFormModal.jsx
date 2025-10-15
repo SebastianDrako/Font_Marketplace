@@ -38,7 +38,7 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
       setCategories(response.data);
     } catch (err) {
       console.error("Failed to fetch categories", err);
-      setError('Failed to load categories.');
+      setError('Error al cargar las categorías.');
     }
   };
 
@@ -98,7 +98,7 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
       setFormData(prev => ({ ...prev, categoryId: response.data.id }));
 
     } catch (err) {
-      setCategoryError('Failed to create category.');
+      setCategoryError('Error al crear la categoría.');
       console.error(err);
     } finally {
       setCategoryLoading(false);
@@ -106,14 +106,14 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
   };
 
   const handleDeleteImage = async (imageId) => {
-    if (!window.confirm('Are you sure you want to delete this image?')) return;
+    if (!window.confirm('¿Estás seguro de que quieres eliminar esta imagen?')) return;
 
     try {
       await apiClient.delete('/api/v1/images', { data: { id: imageId } });
       setImageIds(currentIds => currentIds.filter(id => id !== imageId));
     } catch (err) {
       console.error("Failed to delete image", err);
-      setError('Failed to delete image. Please try again.');
+      setError('Error al eliminar la imagen. Por favor, inténtalo de nuevo.');
     }
   };
 
@@ -176,7 +176,7 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
       onSave(); // Notify parent to refresh and close modal
 
     } catch (err) {
-      setError('Failed to save product. Please try again.');
+      setError('Error al guardar el producto. Por favor, inténtalo de nuevo.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -186,31 +186,31 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>{product ? 'Edit Product' : 'Create Product'}</Modal.Title>
+        <Modal.Title>{product ? 'Editar Producto' : 'Crear Producto'}</Modal.Title>
       </Modal.Header>
       <Form onSubmit={handleSubmit}>
         <Modal.Body>
           {error && <Alert variant="danger">{error}</Alert>}
           <Form.Group className="mb-3">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Nombre</Form.Label>
             <Form.Control type="text" name="name" value={formData.name} onChange={handleFormChange} required />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Description</Form.Label>
+            <Form.Label>Descripción</Form.Label>
             <Form.Control as="textarea" rows={3} name="description" value={formData.description} onChange={handleFormChange} required />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Category</Form.Label>
+            <Form.Label>Categoría</Form.Label>
             <div className="d-flex">
               <Form.Select name="categoryId" value={formData.categoryId} onChange={handleFormChange} required>
-                <option value="">Select a category</option>
+                <option value="">Selecciona una categoría</option>
                 <CategoryOptions categories={categories} />
               </Form.Select>
-              <Button variant="outline-secondary" className="ms-2" onClick={() => setShowCategoryModal(true)}>New</Button>
+              <Button variant="outline-secondary" className="ms-2" onClick={() => setShowCategoryModal(true)}>Nueva</Button>
             </div>
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Price</Form.Label>
+            <Form.Label>Precio</Form.Label>
             <Form.Control type="number" name="price" value={formData.price} onChange={handleFormChange} required />
           </Form.Group>
           <Form.Group className="mb-3">
@@ -218,22 +218,22 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
             <Form.Control type="number" name="stock" value={formData.stock} onChange={handleFormChange} required />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Check type="switch" label="Active" name="active" checked={formData.active} onChange={handleFormChange} />
+            <Form.Check type="switch" label="Activo" name="active" checked={formData.active} onChange={handleFormChange} />
           </Form.Group>
           <Form.Group className="mb-3">
-            <Form.Label>Images</Form.Label>
+            <Form.Label>Imágenes</Form.Label>
             <Form.Control type="file" multiple onChange={handleImageChange} />
           </Form.Group>
 
           {imageIds.length > 0 && (
             <Form.Group className="mb-3">
-              <Form.Label>Existing Images</Form.Label>
+              <Form.Label>Imágenes Existentes</Form.Label>
               <div className="d-flex flex-wrap">
                 {imageIds.map((id, index) => (
                   <div key={id} className="border p-2 m-1 text-center" style={{ width: '150px' }}>
-                    <AuthImage imageId={id} alt={`Product image ${index + 1}`} className="img-fluid mb-2" />
+                    <AuthImage imageId={id} alt={`Imagen del producto ${index + 1}`} className="img-fluid mb-2" />
                     <div>
-                      <Button variant="danger" size="sm" onClick={() => handleDeleteImage(id)}>Delete</Button>
+                      <Button variant="danger" size="sm" onClick={() => handleDeleteImage(id)}>Eliminar</Button>
                       <Button variant="secondary" size="sm" className="ms-1" onClick={() => handleMoveImage(index, 'up')} disabled={index === 0}>↑</Button>
                       <Button variant="secondary" size="sm" className="ms-1" onClick={() => handleMoveImage(index, 'down')} disabled={index === imageIds.length - 1}>↓</Button>
                     </div>
@@ -244,9 +244,9 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={onHide} disabled={loading}>Cancel</Button>
+          <Button variant="secondary" onClick={onHide} disabled={loading}>Cancelar</Button>
           <Button variant="primary" type="submit" disabled={loading}>
-            {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Save Changes'}
+            {loading ? <Spinner as="span" animation="border" size="sm" /> : 'Guardar Cambios'}
           </Button>
         </Modal.Footer>
       </Form>
@@ -254,13 +254,13 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
       {/* Category Creation Modal */}
       <Modal show={showCategoryModal} onHide={() => setShowCategoryModal(false)} centered>
         <Modal.Header closeButton>
-          <Modal.Title>Create New Category</Modal.Title>
+          <Modal.Title>Crear Nueva Categoría</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleCreateCategory}>
           <Modal.Body>
             {categoryError && <Alert variant="danger">{categoryError}</Alert>}
             <Form.Group className="mb-3">
-              <Form.Label>Category Name</Form.Label>
+              <Form.Label>Nombre de la Categoría</Form.Label>
               <Form.Control 
                 type="text" 
                 value={newCategoryName} 
@@ -269,20 +269,20 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
               />
             </Form.Group>
             <Form.Group className="mb-3">
-              <Form.Label>Parent Category (optional)</Form.Label>
+              <Form.Label>Categoría Padre (opcional)</Form.Label>
               <Form.Select 
                 value={newCategoryParentId} 
                 onChange={(e) => setNewCategoryParentId(e.target.value)}
               >
-                <option value="0">None (Root Category)</option>
+                <option value="0">Ninguna (Categoría Raíz)</option>
                 <CategoryOptions categories={categories} />
               </Form.Select>
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={() => setShowCategoryModal(false)} disabled={categoryLoading}>Cancel</Button>
+            <Button variant="secondary" onClick={() => setShowCategoryModal(false)} disabled={categoryLoading}>Cancelar</Button>
             <Button variant="primary" type="submit" disabled={categoryLoading}>
-              {categoryLoading ? <Spinner as="span" animation="border" size="sm" /> : 'Create Category'}
+              {categoryLoading ? <Spinner as="span" animation="border" size="sm" /> : 'Crear Categoría'}
             </Button>
           </Modal.Footer>
         </Form>

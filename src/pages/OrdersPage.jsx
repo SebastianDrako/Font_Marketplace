@@ -16,7 +16,7 @@ const OrdersPage = () => {
       const sortedOrders = response.data.sort((a, b) => new Date(b.orderTimestamp) - new Date(a.orderTimestamp));
       setOrders(sortedOrders);
     } catch (err) {
-      setError('Failed to fetch orders.');
+      setError('Error al cargar los pedidos.');
     } finally {
       setLoading(false);
     }
@@ -30,10 +30,10 @@ const OrdersPage = () => {
     setFeedback({ type: '', message: '' });
     try {
       await orderService.retryPayment(orderId);
-      setFeedback({ type: 'success', message: `Payment retry initiated for order #${orderId}. Refreshing...` });
+      setFeedback({ type: 'success', message: `Reintento de pago iniciado para el pedido #${orderId}. Actualizando...` });
       setTimeout(fetchOrders, 2000); // Refresh orders after a short delay
     } catch (err) {
-      setFeedback({ type: 'danger', message: `Failed to retry payment for order #${orderId}.` });
+      setFeedback({ type: 'danger', message: `Error al reintentar el pago para el pedido #${orderId}.` });
     }
   };
 
@@ -43,25 +43,25 @@ const OrdersPage = () => {
       // Payment Statuses
       case 'SUCCESS':
       case 'PAID':
-        return { variant: 'success', name: 'Paid' };
+        return { variant: 'success', name: 'Pagado' };
       case 'WAITING':
       case 'PENDING':
-        return { variant: 'warning', name: 'Pending' };
+        return { variant: 'warning', name: 'Pendiente' };
       case 'FAILED':
-        return { variant: 'danger', name: 'Failed' };
+        return { variant: 'danger', name: 'Fallido' };
 
       // Order Statuses
       case 'DELIVERED':
-        return { variant: 'success', name: 'Delivered' };
+        return { variant: 'success', name: 'Entregado' };
       case 'PLACED':
-        return { variant: 'warning', name: 'Placed' };
+        return { variant: 'warning', name: 'Realizado' };
       case 'START_DELIVERY':
       case 'SHIPPED':
-        return { variant: 'info', name: 'Shipped' };
+        return { variant: 'info', name: 'Enviado' };
       case 'PROCESSING':
-        return { variant: 'primary', name: 'Processing' };
+        return { variant: 'primary', name: 'Procesando' };
       case 'CANCELLED':
-        return { variant: 'danger', name: 'Cancelled' };
+        return { variant: 'danger', name: 'Cancelado' };
 
       default:
         return { variant: 'secondary', name: status };
@@ -70,7 +70,7 @@ const OrdersPage = () => {
 
   return (
     <Card>
-      <Card.Header as="h2">My Orders</Card.Header>
+      <Card.Header as="h2">Mis Pedidos</Card.Header>
       <Card.Body>
         {error && <Alert variant="danger">{error}</Alert>}
         {feedback.message && <Alert variant={feedback.type}>{feedback.message}</Alert>}
@@ -85,9 +85,9 @@ const OrdersPage = () => {
               <Card key={order.orderId} className="mb-3">
                 <Card.Header className="d-flex justify-content-between align-items-center">
                   <div>
-                    <strong>Order #{order.orderId}</strong>
+                    <strong>Pedido #{order.orderId}</strong>
                     <br />
-                    <small className="text-muted">Date: {new Date(order.orderTimestamp).toLocaleDateString()}</small>
+                    <small className="text-muted">Fecha: {new Date(order.orderTimestamp).toLocaleDateString()}</small>
                   </div>
                   <div className="text-end">
                     <Badge bg={orderStatusInfo.variant}>{orderStatusInfo.name}</Badge>
@@ -109,13 +109,13 @@ const OrdersPage = () => {
                     </ListGroup.Item>
                   </ListGroup>
                   <div className="mt-3">
-                      <p><strong>Shipping Address:</strong> {order.deliveryAddress}</p>
-                      <p><strong>Payment Method:</strong> {order.paymentMethod}</p>
+                      <p><strong>Dirección de Envío:</strong> {order.deliveryAddress}</p>
+                      <p><strong>Método de Pago:</strong> {order.paymentMethod}</p>
                   </div>
                   {order.paymentStatus === 'FAILED' && (
                     <div className="text-end mt-2">
                       <Button variant="warning" onClick={() => handleRetryPayment(order.orderId)}>
-                        Retry Payment
+                        Reintentar Pago
                       </Button>
                     </div>
                   )}
@@ -124,7 +124,7 @@ const OrdersPage = () => {
             );
           })
         ) : (
-          <p>You have no orders.</p>
+          <p>No tienes pedidos.</p>
         )}
       </Card.Body>
     </Card>

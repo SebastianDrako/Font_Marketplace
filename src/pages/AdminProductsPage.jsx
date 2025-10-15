@@ -24,7 +24,7 @@ const AdminProductsPage = () => {
       setProducts(response.data.products);
       setTotalPages(response.data.totalPages);
     } catch (err) {
-      setError('Failed to fetch products. Please try again later.');
+      setError('Error al cargar los productos. Por favor, inténtalo de nuevo más tarde.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -76,9 +76,9 @@ const AdminProductsPage = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Administrar Productos</h1>
         <div>
-          <Button variant="primary" className="me-2" onClick={handleShowCreateModal}>Create New Product</Button>
+          <Button variant="primary" className="me-2" onClick={handleShowCreateModal}>Crear Nuevo Producto</Button>
           <LinkContainer to="/admin">
-            <Button variant="secondary">Back to Admin Menu</Button>
+            <Button variant="secondary">Volver al Menú de Administrador</Button>
           </LinkContainer>
         </div>
       </div>
@@ -97,11 +97,11 @@ const AdminProductsPage = () => {
             <thead>
               <tr>
                 <th>ID</th>
-                <th>Name</th>
-                <th>Price</th>
+                <th>Nombre</th>
+                <th>Precio</th>
                 <th>Stock</th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th>Estado</th>
+                <th>Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -113,18 +113,18 @@ const AdminProductsPage = () => {
                   <td>{product.stock}</td>
                   <td>
                     <Badge bg={product.active ? 'success' : 'secondary'}>
-                      {product.active ? 'Active' : 'Inactive'}
+                      {product.active ? 'Activo' : 'Inactivo'}
                     </Badge>
                   </td>
                   <td>
                     <ButtonGroup>
                       {product.active && (
                         <LinkContainer to={`/product/${product.id}`}>
-                          <Button variant="outline-info" size="sm">View</Button>
+                          <Button variant="outline-info" size="sm">Ver</Button>
                         </LinkContainer>
                       )}
-                      <Button variant="outline-primary" size="sm" onClick={() => handleShowEditModal(product)}>Edit</Button>
-                      <Button variant="outline-danger" size="sm" onClick={() => handleShowDeleteModal(product)}>Delete</Button>
+                      <Button variant="outline-primary" size="sm" onClick={() => handleShowEditModal(product)}>Editar</Button>
+                      <Button variant="outline-danger" size="sm" onClick={() => handleShowDeleteModal(product)}>Eliminar</Button>
                     </ButtonGroup>
                   </td>
                 </tr>
@@ -135,10 +135,10 @@ const AdminProductsPage = () => {
           <div className="d-flex justify-content-center">
             <ButtonGroup>
               <Button onClick={() => setPage(p => p - 1)} disabled={page === 0}>
-                Previous
+                Anterior
               </Button>
               <Button onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>
-                Next
+                Siguiente
               </Button>
             </ButtonGroup>
           </div>
@@ -148,17 +148,17 @@ const AdminProductsPage = () => {
       {/* Delete Confirmation Modal */}
       <Modal show={showDeleteModal} onHide={handleCloseDeleteModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Delete Product</Modal.Title>
+          <Modal.Title>Eliminar Producto</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          Are you sure you want to delete the product "{productToDelete?.name}"?
+          ¿Estás seguro de que quieres eliminar el producto "{productToDelete?.name}"?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="secondary" onClick={handleCloseDeleteModal}>
-            Cancel
+            Cancelar
           </Button>
           <Button variant="danger" onClick={handleDeleteProduct}>
-            Delete
+            Eliminar
           </Button>
         </Modal.Footer>
       </Modal>

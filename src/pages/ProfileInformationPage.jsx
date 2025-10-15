@@ -18,24 +18,24 @@ const ProfileInformationPage = () => {
     setSuccess('');
 
     if (newPassword !== confirmPassword) {
-      setError('New passwords do not match.');
+      setError('Las contraseñas nuevas no coinciden.');
       return;
     }
 
     if (newPassword.length < 6) { // Example validation
-        setError('New password must be at least 6 characters long.');
+        setError('La nueva contraseña debe tener al menos 6 caracteres.');
         return;
     }
 
     setLoading(true);
     try {
       await userService.changePassword({ oldPassword, newPassword });
-      setSuccess('Password changed successfully!');
+      setSuccess('¡Contraseña cambiada con éxito!');
       setOldPassword('');
       setNewPassword('');
       setConfirmPassword('');
     } catch (err) {
-      setError(err.response?.data?.message || 'Failed to change password. Please check your old password.');
+      setError(err.response?.data?.message || 'Error al cambiar la contraseña. Por favor, verifica tu contraseña anterior.');
     } finally {
       setLoading(false);
     }
@@ -43,24 +43,24 @@ const ProfileInformationPage = () => {
 
   return (
     <Card>
-      <Card.Header as="h2">My Information</Card.Header>
+      <Card.Header as="h2">Mi Información</Card.Header>
       <Card.Body>
         <Card.Text>
-          <strong>Name:</strong> {user?.name}
+          <strong>Nombre:</strong> {user?.name}
         </Card.Text>
         <Card.Text className="mb-4">
-          <strong>Email:</strong> {user?.email}
+          <strong>Correo Electrónico:</strong> {user?.email}
         </Card.Text>
 
         <hr />
 
-        <h4 className="mt-4">Change Password</h4>
+        <h4 className="mt-4">Cambiar Contraseña</h4>
         <Form onSubmit={handleSubmit}>
           {error && <Alert variant="danger">{error}</Alert>}
           {success && <Alert variant="success">{success}</Alert>}
 
           <Form.Group className="mb-3" controlId="oldPassword">
-            <Form.Label>Old Password</Form.Label>
+            <Form.Label>Contraseña Antigua</Form.Label>
             <Form.Control
               type="password"
               value={oldPassword}
@@ -70,7 +70,7 @@ const ProfileInformationPage = () => {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="newPassword">
-            <Form.Label>New Password</Form.Label>
+            <Form.Label>Contraseña Nueva</Form.Label>
             <Form.Control
               type="password"
               value={newPassword}
@@ -80,7 +80,7 @@ const ProfileInformationPage = () => {
           </Form.Group>
 
           <Form.Group className="mb-3" controlId="confirmPassword">
-            <Form.Label>Confirm New Password</Form.Label>
+            <Form.Label>Confirmar Contraseña Nueva</Form.Label>
             <Form.Control
               type="password"
               value={confirmPassword}
@@ -90,7 +90,7 @@ const ProfileInformationPage = () => {
           </Form.Group>
 
           <Button variant="primary" type="submit" disabled={loading}>
-            {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Change Password'}
+            {loading ? <Spinner as="span" animation="border" size="sm" role="status" aria-hidden="true" /> : 'Cambiar Contraseña'}
           </Button>
         </Form>
       </Card.Body>

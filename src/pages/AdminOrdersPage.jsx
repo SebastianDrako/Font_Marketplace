@@ -23,7 +23,7 @@ const AdminOrdersPage = () => {
       const response = await apiClient.get('/api/v1/admin/orders');
       setOrders(response.data);
     } catch (err) {
-      setError('Failed to fetch orders. Please try again later.');
+      setError('Error al cargar los pedidos. Por favor, inténtalo de nuevo más tarde.');
       console.error(err);
     } finally {
       setLoading(false);
@@ -99,7 +99,7 @@ const AdminOrdersPage = () => {
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Administrar Pedidos</h1>
         <LinkContainer to="/admin">
-          <Button variant="secondary">Back to Admin Menu</Button>
+          <Button variant="secondary">Volver al Menú de Administrador</Button>
         </LinkContainer>
       </div>
 
@@ -115,13 +115,13 @@ const AdminOrdersPage = () => {
         <Table striped bordered hover responsive>
           <thead>
             <tr>
-              <th>Order ID</th>
-              <th>User Email</th>
-              <th>Date</th>
+              <th>ID Pedido</th>
+              <th>Email Usuario</th>
+              <th>Fecha</th>
               <th>Total</th>
-              <th>Payment Status</th>
-              <th>Order Status</th>
-              <th>Actions</th>
+              <th>Estado de Pago</th>
+              <th>Estado del Pedido</th>
+              <th>Acciones</th>
             </tr>
           </thead>
           <tbody>
@@ -143,8 +143,8 @@ const AdminOrdersPage = () => {
                 </td>
                 <td>
                   <ButtonGroup>
-                    <Button variant="outline-info" size="sm" onClick={() => handleShowDetails(order)}>View Details</Button>
-                    <Button variant="outline-primary" size="sm" onClick={() => handleShowEditStatus(order)}>Edit Status</Button>
+                    <Button variant="outline-info" size="sm" onClick={() => handleShowDetails(order)}>Ver Detalles</Button>
+                    <Button variant="outline-primary" size="sm" onClick={() => handleShowEditStatus(order)}>Editar Estado</Button>
                   </ButtonGroup>
                 </td>
               </tr>
@@ -156,33 +156,33 @@ const AdminOrdersPage = () => {
       {/* Order Details Modal */}
       <Modal show={showDetailsModal} onHide={handleCloseDetailsModal} size="lg">
         <Modal.Header closeButton>
-          <Modal.Title>Order Details #{selectedOrder?.orderId}</Modal.Title>
+          <Modal.Title>Detalles del Pedido #{selectedOrder?.orderId}</Modal.Title>
         </Modal.Header>
         <Modal.Body>
           {selectedOrder && (
             <>
               <Row>
                 <Col md={6}>
-                  <h5>Delivery Information</h5>
-                  <p><strong>Provider:</strong> {selectedOrder.deliveryProvider}</p>
-                  <p><strong>Address:</strong> {selectedOrder.deliveryAddress}</p>
+                  <h5>Información de Entrega</h5>
+                  <p><strong>Proveedor:</strong> {selectedOrder.deliveryProvider}</p>
+                  <p><strong>Dirección:</strong> {selectedOrder.deliveryAddress}</p>
                 </Col>
                 <Col md={6}>
-                  <h5>Payment Information</h5>
-                  <p><strong>Method:</strong> {selectedOrder.paymentMethod}</p>
-                  <p><strong>Payment ID:</strong> {selectedOrder.paymentId}</p>
-                  <p><strong>Order Date:</strong> {new Date(selectedOrder.orderTimestamp).toLocaleString()}</p>
-                  <p><strong>Payment Date:</strong> {new Date(selectedOrder.paymentTimestamp).toLocaleString()}</p>
+                  <h5>Información de Pago</h5>
+                  <p><strong>Método:</strong> {selectedOrder.paymentMethod}</p>
+                  <p><strong>ID de Pago:</strong> {selectedOrder.paymentId}</p>
+                  <p><strong>Fecha del Pedido:</strong> {new Date(selectedOrder.orderTimestamp).toLocaleString()}</p>
+                  <p><strong>Fecha del Pago:</strong> {new Date(selectedOrder.paymentTimestamp).toLocaleString()}</p>
                 </Col>
               </Row>
               <hr />
-              <h5>Items</h5>
+              <h5>Artículos</h5>
               <Table striped bordered size="sm">
                 <thead>
                   <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -199,19 +199,19 @@ const AdminOrdersPage = () => {
           )}
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleCloseDetailsModal}>Close</Button>
+          <Button variant="secondary" onClick={handleCloseDetailsModal}>Cerrar</Button>
         </Modal.Footer>
       </Modal>
 
       {/* Edit Status Modal */}
       <Modal show={showEditStatusModal} onHide={handleCloseEditStatusModal}>
         <Modal.Header closeButton>
-          <Modal.Title>Edit Status for Order #{editingOrder?.orderId}</Modal.Title>
+          <Modal.Title>Editar Estado del Pedido #{editingOrder?.orderId}</Modal.Title>
         </Modal.Header>
         <Form onSubmit={handleUpdateStatus}>
           <Modal.Body>
             <Form.Group className="mb-3">
-              <Form.Label>Payment Status</Form.Label>
+              <Form.Label>Estado de Pago</Form.Label>
               <Form.Select name="paymentStatus" value={statusData.paymentStatus} onChange={handleStatusFormChange}>
                 <option value="WAITING">WAITING</option>
                 <option value="SUCCESS">SUCCESS</option>
@@ -219,7 +219,7 @@ const AdminOrdersPage = () => {
               </Form.Select>
             </Form.Group>
             <Form.Group>
-              <Form.Label>Order Status</Form.Label>
+              <Form.Label>Estado del Pedido</Form.Label>
               <Form.Select name="orderStatus" value={statusData.orderStatus} onChange={handleStatusFormChange}>
                 <option value="PLACED">PLACED</option>
                 <option value="START_DELIVERY">START_DELIVERY</option>
@@ -228,8 +228,8 @@ const AdminOrdersPage = () => {
             </Form.Group>
           </Modal.Body>
           <Modal.Footer>
-            <Button variant="secondary" onClick={handleCloseEditStatusModal}>Cancel</Button>
-            <Button variant="primary" type="submit">Save Changes</Button>
+            <Button variant="secondary" onClick={handleCloseEditStatusModal}>Cancelar</Button>
+            <Button variant="primary" type="submit">Guardar Cambios</Button>
           </Modal.Footer>
         </Form>
       </Modal>
