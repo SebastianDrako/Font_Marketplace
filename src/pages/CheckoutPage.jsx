@@ -1,22 +1,12 @@
-
 import React, { useMemo, useState } from "react";
-
-
-const COUNTRIES = [
-  { code: "AR", name: "Argentina" },
-  { code: "CO", name: "Colombia" },
-  { code: "CL", name: "Chile" },
-  { code: "MX", name: "México" },
-  { code: "US", name: "Estados Unidos" },
-  { code: "ES", name: "España" },
-];
+import { useCart } from "../hooks/useCart";      // named export
+import { calcTotals } from "../utils/cartTotals";
 
 const initialShipping = {
   fullName: "Juan Pérez",
   address: "Calle 123 #45-67",
   city: "Buenos Aires",
   postalCode: "C1425",
-  country: "AR",
 };
 
 const initialPayment = {
@@ -25,15 +15,6 @@ const initialPayment = {
   expiry: "",
   cvv: "",
   saveCard: true,
-};
-
-const cart = {
-  items: [
-    { id: 1, name: "Café colombiano 500g", qty: 1, price: 45 },
-    { id: 2, name: "Arequipe artesanal", qty: 2, price: 37.5 },
-  ],
-  shipping: 15,
-  currency: "USD",
 };
 
 function Step({ n, label, active, done }) {
@@ -54,7 +35,7 @@ function money(n) {
   try {
     return new Intl.NumberFormat("es-AR", { style: "currency", currency: "USD" }).format(n);
   } catch {
-    return `$${n.toFixed(2)} USD`;
+    return `$${Number(n || 0).toFixed(2)} USD`;
   }
 }
 
@@ -66,13 +47,25 @@ export default function CheckoutPage() {
   const [placing, setPlacing] = useState(false);
   const [orderId, setOrderId] = useState(null);
 
-  const subtotal = useMemo(() => cart.items.reduce((a, it) => a + it.qty * it.price, 0), []);
-  const total = useMemo(() => subtotal + cart.shipping, [subtotal]);
+  // Carrito del contexto
+  const { cart: ctxCart } = useCart();
+
+  // Totales compartidos (mismo cálculo que el carrito)
+  const { subtotal, totalItems } = useMemo(() => calcTotals(ctxCart), [ctxCart]);
+
+  // Shipping informativo (no se suma al total para igualar el carrito)
+  const shippingCost = 0;
+
+  // Total a pagar igual al del carrito
+  const totalToPay = subtotal;
 
   const maskNum = (v) => (v.replace(/\D/g, "").match(/\d{1,4}/g) || []).join(" ").slice(0, 19);
 
+  // Validación de envío SIN country
   const okShipping = () =>
-    ["fullName","address","city","postalCode","country"].every((k) => String(shipping[k]||"").trim());
+    ["fullName", "address", "city", "postalCode"].every(
+      (k) => String(shipping[k] || "").trim()
+    );
 
   const okPayment = () => {
     const num = payment.cardNumber.replace(/\s+/g, "");
@@ -93,7 +86,6 @@ export default function CheckoutPage() {
     if (!terms) return alert("Debes aceptar los términos.");
     setPlacing(true);
     try {
-      // Aquí llamas a tu API para crear la orden
       await new Promise((r) => setTimeout(r, 800));
       setOrderId(`ORD-${Math.random().toString(36).slice(2,8).toUpperCase()}`);
     } finally {
@@ -142,13 +134,6 @@ export default function CheckoutPage() {
                       <input className="form-control" value={shipping.postalCode}
                         onChange={(e)=>setShipping({...shipping, postalCode: e.target.value})}/>
                     </div>
-                    <div className="col-12">
-                      <label className="form-label small">Country</label>
-                      <select className="form-select" value={shipping.country}
-                        onChange={(e)=>setShipping({...shipping, country: e.target.value})}>
-                        {COUNTRIES.map(c => <option key={c.code} value={c.code}>{c.name}</option>)}
-                      </select>
-                    </div>
                   </div>
                   <div className="d-flex justify-content-end mt-3">
                     <button className="btn btn-primary">Continue to Payment →</button>
@@ -175,35 +160,33 @@ export default function CheckoutPage() {
                     <div className="col-6">
                       <label className="form-label small">Expiration (MM/AA)</label>
                       <input
-                      type="text"
-                      className="form-control"
-                      name="expiry"
-                      autoComplete="cc-exp"
-                      inputMode="text"          // evitamos teclados “numéricos” que a veces bloquean /
-                      maxLength={5}
-                      placeholder="MM/AA"
-                      value={payment.expiry}
-                      onChange={(e) => {
-                        // Solo dígitos, construimos MM/AA
-                        let raw = e.target.value.replace(/\D/g, "").slice(0, 4); // máx 4 dígitos
-                        let v = raw;
-                        if (raw.length >= 3) v = raw.slice(0, 2) + "/" + raw.slice(2); // MM/AA
-                        setPayment({ ...payment, expiry: v });
-                      }}
-                      onKeyDown={(e) => {
-                        // Backspace amigable si el cursor está al final y hay una barra
-                        if (e.key === "Backspace" && payment.expiry.endsWith("/")) {
-                          e.preventDefault();
-                          setPayment({ ...payment, expiry: payment.expiry.slice(0, 1) });
-                        }
+                        type="text"
+                        className="form-control"
+                        name="expiry"
+                        autoComplete="cc-exp"
+                        inputMode="text"
+                        maxLength={5}
+                        placeholder="MM/AA"
+                        value={payment.expiry}
+                        onChange={(e) => {
+                          let raw = e.target.value.replace(/\D/g, "").slice(0, 4);
+                          let v = raw;
+                          if (raw.length >= 3) v = raw.slice(0, 2) + "/" + raw.slice(2);
+                          setPayment({ ...payment, expiry: v });
                         }}
-                        />
+                        onKeyDown={(e) => {
+                          if (e.key === "Backspace" && payment.expiry.endsWith("/")) {
+                            e.preventDefault();
+                            setPayment({ ...payment, expiry: payment.expiry.slice(0, 1) });
+                          }
+                        }}
+                      />
                     </div>
                     <div className="col-6">
                       <label className="form-label small">CVV</label>
                       <input className="form-control" inputMode="numeric" maxLength="4" placeholder="3-4 dígitos"
                         value={payment.cvv}
-                        onChange={(e)=>setPayment({...payment, cvv: e.target.value.replace(/\\D/g, "")})}/>
+                        onChange={(e)=>setPayment({...payment, cvv: e.target.value.replace(/\D/g, "")})}/>
                     </div>
                     <div className="col-12 form-check mt-1 ms-1">
                       <input className="form-check-input" type="checkbox" id="saveCard"
@@ -232,7 +215,6 @@ export default function CheckoutPage() {
                           <div>{shipping.fullName}</div>
                           <div>{shipping.address}</div>
                           <div>{shipping.city} • {shipping.postalCode}</div>
-                          <div>{COUNTRIES.find(c=>c.code===shipping.country)?.name}</div>
                         </div>
                       </div>
                     </div>
@@ -250,10 +232,19 @@ export default function CheckoutPage() {
 
                   <div className="border rounded p-3 mt-3">
                     <h6 className="fw-semibold">Resumen</h6>
-                    <div className="d-flex justify-content-between small"><span className="text-muted">Subtotal</span><span>{money(subtotal)}</span></div>
-                    <div className="d-flex justify-content-between small"><span className="text-muted">Shipping</span><span>{money(cart.shipping)}</span></div>
+                    <div className="d-flex justify-content-between small">
+                      <span className="text-muted">Artículos</span><span>{totalItems}</span>
+                    </div>
+                    <div className="d-flex justify-content-between small">
+                      <span className="text-muted">Subtotal</span><span>{money(subtotal)}</span>
+                    </div>
+                    <div className="d-flex justify-content-between small">
+                      <span className="text-muted">Shipping</span><span>{money(shippingCost)}</span>
+                    </div>
                     <hr className="my-2"/>
-                    <div className="d-flex justify-content-between"><strong>Total</strong><strong>{money(total)}</strong></div>
+                    <div className="d-flex justify-content-between">
+                      <strong>Total a pagar</strong><strong>{money(totalToPay)}</strong>
+                    </div>
                   </div>
 
                   {orderId && <div className="alert alert-primary mt-3 mb-0">¡Orden creada! ID: <strong>{orderId}</strong></div>}
@@ -279,10 +270,19 @@ export default function CheckoutPage() {
           <div className="card shadow-sm sticky-top" style={{top:"1.5rem"}}>
             <div className="card-body">
               <h6 className="fw-semibold mb-3">Order Summary</h6>
-              <div className="d-flex justify-content-between small"><span className="text-muted">Subtotal</span><span>{money(subtotal)}</span></div>
-              <div className="d-flex justify-content-between small"><span className="text-muted">Shipping</span><span>{money(cart.shipping)}</span></div>
+              <div className="d-flex justify-content-between small">
+                <span className="text-muted">Artículos</span><span>{totalItems}</span>
+              </div>
+              <div className="d-flex justify-content-between small">
+                <span className="text-muted">Subtotal</span><span>{money(subtotal)}</span>
+              </div>
+              <div className="d-flex justify-content-between small">
+                <span className="text-muted">Shipping</span><span>{money(shippingCost)}</span>
+              </div>
               <hr className="my-2"/>
-              <div className="d-flex justify-content-between"><strong>Total</strong><strong>{money(total)}</strong></div>
+              <div className="d-flex justify-content-between">
+                <strong>Total a pagar</strong><strong>{money(totalToPay)}</strong>
+              </div>
 
               <div className="alert alert-success d-flex align-items-start gap-2 mt-3 mb-0">
                 <span className="badge text-bg-success rounded-circle d-inline-flex align-items-center justify-content-center" style={{width:20,height:20}}>✓</span>
