@@ -3,6 +3,7 @@ import { useCart } from '../hooks/useCart';
 import { Container, Row, Col, Card, Button, ListGroup } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { calcTotals } from '../utils/cartTotals';
+import AuthImage from '../components/common/AuthImage';
 
 const CartPage = () => {
 const { cart, removeFromCart, decrementQuantity, addToCart, clearCart } = useCart();
@@ -26,16 +27,23 @@ return (
         <h2>Tu Carrito</h2>
         <ListGroup variant="flush">
             {cart.map(item => (
-                <ListGroup.Item key={item.id} className="d-flex justify-content-between align-items-center">
-                <div>
-                    <h5>{item.name}</h5>
-                    <p className="mb-1">Precio: ${item.price}</p> 
+                <ListGroup.Item key={item.itemId} className="d-flex justify-content-between align-items-center">
                     <div className="d-flex align-items-center">
-                    <Button variant="outline-secondary" size="sm" onClick={() => decrementQuantity(item.id)}>-</Button>
-                    <span className="mx-2">{item.quantity}</span>
-                    <Button variant="outline-secondary" size="sm" onClick={() => addToCart(item, 1)}>+</Button>
+                        <AuthImage 
+                            imageId={item.imageId} 
+                            alt={item.name} 
+                            style={{ width: '50px', height: '50px', objectFit: 'cover', marginRight: '1rem', borderRadius: '4px' }} 
+                        />
+                        <div>
+                            <h5 className="mb-1">{item.name}</h5>
+                            <p className="mb-1 text-muted">Precio: ${item.price}</p> 
+                            <div className="d-flex align-items-center mt-2">
+                            <Button variant="outline-secondary" size="sm" onClick={() => decrementQuantity(item.id)}>-</Button>
+                            <span className="mx-2 font-weight-bold">{item.quantity}</span>
+                            <Button variant="outline-secondary" size="sm" onClick={() => addToCart(item, 1)}>+</Button>
+                            </div>
+                        </div>
                     </div>
-                </div>
                 <Button variant="danger" size="sm" onClick={() => removeFromCart(item.id)}>Eliminar</Button>
                 </ListGroup.Item>
             ))}
