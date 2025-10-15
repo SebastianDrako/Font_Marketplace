@@ -48,7 +48,7 @@ export const getProductsByCategory = async (categoryId, page = 0, size = 20) => 
       params: { categoryId, page, size }
     });
     console.log('[productService] getProductsByCategory: Respuesta de API exitosa:', response.data);
-    return response.data;
+    return response.data.products; // Devuelve solo el array de productos
   } catch (error) {
     console.error(`[productService] getProductsByCategory: Error en la petición:`, error);
     // No lanzamos un error aquí para no detener el proceso de búsqueda de relacionados

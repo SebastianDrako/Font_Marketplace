@@ -9,7 +9,7 @@ const AdminProductsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [page, setPage] = useState(0);
-  const [isLastPage, setIsLastPage] = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
 
   // Modal State
   const [showFormModal, setShowFormModal] = useState(false);
@@ -21,8 +21,8 @@ const AdminProductsPage = () => {
     try {
       setLoading(true);
       const response = await apiClient.get(`/api/v1/admin/products/all?page=${pageNum}&size=20`);
-      setProducts(response.data);
-      setIsLastPage(response.data.length < 20);
+      setProducts(response.data.products);
+      setTotalPages(response.data.totalPages);
     } catch (err) {
       setError('Failed to fetch products. Please try again later.');
       console.error(err);
@@ -137,7 +137,7 @@ const AdminProductsPage = () => {
               <Button onClick={() => setPage(p => p - 1)} disabled={page === 0}>
                 Previous
               </Button>
-              <Button onClick={() => setPage(p => p + 1)} disabled={isLastPage}>
+              <Button onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>
                 Next
               </Button>
             </ButtonGroup>
