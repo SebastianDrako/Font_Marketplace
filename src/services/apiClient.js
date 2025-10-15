@@ -1,7 +1,7 @@
 
 import axios from 'axios';
 
-const API_BASE_URL = 'https://silent-fire-27c2.sguerrero-sgc.workers.dev';
+const API_BASE_URL = 'http://23.95.3.178:8080';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
