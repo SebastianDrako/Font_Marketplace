@@ -104,7 +104,7 @@ const LoginPage = () => {
         <Title>Iniciar Sesión</Title>
         <Form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
               id="email"
               type="email"

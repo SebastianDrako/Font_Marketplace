@@ -62,7 +62,8 @@ const CartProvider = ({ children }) => {
                     quantity: item.quantity,
                     price: item.price,
                     lineTotal: item.lineTotal, // Añadir lineTotal
-                    itemId: item.id
+                    itemId: item.id,
+                    imageId: item.imageId
                 }));
                 dispatch({ type: 'SET_CART', payload: { cart: cartData } });
             } catch (error) {

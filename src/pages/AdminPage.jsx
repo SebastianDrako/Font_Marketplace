@@ -5,7 +5,7 @@ import { LinkContainer } from 'react-router-bootstrap';
 const AdminPage = () => {
   return (
     <Container className="mt-5">
-      <h1 className="mb-4">Admin Mode</h1>
+      <h1 className="mb-4">Modo Administrador</h1>
       <Stack gap={3} className="col-md-5 mx-auto">
         <LinkContainer to="/admin/users">
           <Button variant="primary" size="lg">

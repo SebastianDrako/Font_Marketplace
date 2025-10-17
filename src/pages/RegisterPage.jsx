@@ -117,7 +117,7 @@ const RegisterPage = () => {
       navigate('/otp');
     } else {
       // Handle registration error
-      alert('Registration failed');
+      alert('El registro falló');
     }
   };
 
@@ -147,7 +147,7 @@ const RegisterPage = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Correo Electrónico</label>
             <input
               id="email"
               type="email"
@@ -157,7 +157,7 @@ const RegisterPage = () => {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="confirmEmail">Confirmar Email</label>
+            <label htmlFor="confirmEmail">Confirmar Correo Electrónico</label>
             <input
               id="confirmEmail"
               type="email"

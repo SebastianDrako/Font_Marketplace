@@ -12,9 +12,18 @@ import AdminUsersPage from './pages/AdminUsersPage';
 import AdminOrdersPage from './pages/AdminOrdersPage';
 import OtpPage from './pages/OtpPage';
 import AdminProductsPage from './pages/AdminProductsPage';
+import ProfilePage from './pages/ProfilePage';
+import ProfileInformationPage from './pages/ProfileInformationPage';
+import AddressesPage from './pages/AddressesPage';
+import OrdersPage from './pages/OrdersPage';
 import './styles/App.css';
 import CheckoutPage from './pages/CheckoutPage';
+import Catalog from "./pages/Catalog";
 import CatalogPage from './pages/CatalogPage';
+
+import AdminRoute from './components/routes/AdminRoute';
+import UserRoute from './components/routes/UserRoute';
+import { Navigate } from 'react-router-dom';
 
 function App() {
   return (
@@ -27,14 +36,29 @@ function App() {
             <Route path="/Catalog" element={<CatalogPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/catalogPage" element={<CatalogPage />} />
             <Route path="/otp" element={<OtpPage />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/cart" element={<CartPage />} />
-            <Route path="/admin" element={<AdminPage />} />
-            <Route path="/admin/users" element={<AdminUsersPage />} />
-            <Route path="/admin/orders" element={<AdminOrdersPage />} />
-            <Route path="/admin/products" element={<AdminProductsPage />} />
+            
+            <Route element={<AdminRoute />}>
+              <Route path="/admin" element={<AdminPage />} />
+              <Route path="/admin/users" element={<AdminUsersPage />} />
+              <Route path="/admin/orders" element={<AdminOrdersPage />} />
+              <Route path="/admin/products" element={<AdminProductsPage />} />
+            </Route>
+
+            <Route element={<UserRoute />}>
+              <Route path="/profile" element={<ProfilePage />}>
+                <Route index element={<Navigate to="info" replace />} />
+                <Route path="info" element={<ProfileInformationPage />} />
+                <Route path="addresses" element={<AddressesPage />} />
+                <Route path="orders" element={<OrdersPage />} />
+              </Route>
+            </Route>
+
           </Routes>
         </main>
         <Footer />
