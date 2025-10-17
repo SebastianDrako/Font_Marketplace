@@ -1,53 +1,44 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
-import { Container, Row, Col } from 'react-bootstrap';
-import { useProduct } from '../hooks/useProduct';
-import BreadCrumb from '../components/common/products_view/BreadCrumb';
-import CarruselMain from '../components/common/products_view/CarruselMain';
-import TitleDesc from '../components/common/products_view/TitleDesc';
-import AddToCart from '../components/common/products_view/AddToCart';
-import OtrosProductos from '../components/common/products_view/OtrosProductos';
+import React from "react";
+import { Link } from "react-router-dom";
+import { Container, Alert, Spinner } from "react-bootstrap";
+import { useAuth } from "../hooks/useAuth";
+import ProductView from "../components/common/products_view/ProductView";
 
 const ProductPage = () => {
-    const { id } = useParams(); // Obtiene el ID del producto de la URL
-    const { product, breadcrumbs, relatedProducts, loading, error } = useProduct(id);
+  const { user, loading } = useAuth();
 
-    // 1. Manejo del estado de carga
-    if (loading) {
-        return <Container className="my-5 text-center"><h2>Cargando producto...</h2></Container>;
-    }
-
-    // 2. Manejo del estado de error
-    if (error) {
-        return <Container className="my-5 text-center"><p className="text-danger">{error}</p></Container>;
-    }
-    
-    // 3. Si no hay producto después de cargar, mostrar mensaje
-    if (!product) {
-        return <Container className="my-5 text-center"><h2>Producto no encontrado</h2></Container>;
-    }
-
+  if (loading) {
     return (
-        <Container className="my-5">
-            <BreadCrumb path={breadcrumbs} productName={product.name} />
-            <Row>
-                <Col md={6}>
-                    {/* Pasamos los IDs de las imágenes directamente */}
-                    <CarruselMain imageIds={product.imageIds} />
-                </Col>
-                <Col md={6} className="d-flex flex-column justify-content-center ps-md-5">
-                    {/* Usamos el nombre y descripción del producto */}
-                    <TitleDesc 
-                        title={product.name}
-                        description={product.description}
-                    />
-                    {/* Pasamos el producto completo al componente AddToCart */}
-                    <AddToCart product={product} />
-                </Col>
-            </Row>
-            <OtrosProductos products={relatedProducts} />
-        </Container>
+      <Container className="my-5 text-center">
+        <Spinner animation="border" />
+      </Container>
     );
+  }
+
+  if (!user) {
+    return (
+      <Container className="my-5">
+        <Alert variant="warning">
+          <Alert.Heading>¡Atención!</Alert.Heading>
+          <p>
+            Para ver los detalles completos del producto y agregarlo a tu
+            carrito, necesitas iniciar sesión o crear una cuenta.
+          </p>
+          <hr />
+          <div className="d-flex justify-content-end">
+            <Link to="/login" className="btn btn-primary me-2">
+              Iniciar Sesión
+            </Link>
+            <Link to="/register" className="btn btn-secondary">
+              Crear Cuenta
+            </Link>
+          </div>
+        </Alert>
+      </Container>
+    );
+  }
+
+  return <ProductView />;
 };
 
 export default ProductPage;

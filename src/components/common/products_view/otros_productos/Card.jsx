@@ -1,18 +1,66 @@
-import React from 'react';
-import { Card as BootstrapCard } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
-import AuthImage from '../../AuthImage';
+import React from "react";
+import { Card as BootstrapCard, Button } from "react-bootstrap";
+import { Link } from "react-router-dom";
+import AuthImage from "../../AuthImage";
+import styled from "styled-components";
 
-const Card = ({ productId, imageId, title, text }) => {
+const StyledCard = styled(BootstrapCard)`
+  transition:
+    transform 0.2s ease-in-out,
+    box-shadow 0.2s ease-in-out;
+  border: none;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  }
+
+  .card-img-top {
+    height: 200px;
+    object-fit: cover;
+  }
+
+  .card-body {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+
+  .card-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    min-height: 44px; /* Ensures titles of different lengths align */
+  }
+`;
+
+const PriceButton = styled(Button)`
+  font-weight: bold;
+  font-size: 1.1rem;
+`;
+
+const Card = ({ productId, imageId, title, price }) => {
   return (
-    <Link to={`/product/${productId}`} className="text-decoration-none text-dark">
-      <BootstrapCard className="h-100 shadow-sm border-0">
-        <AuthImage imageId={imageId} alt={title} variant="top" as={BootstrapCard.Img} />
+    <Link to={`/product/${productId}`} className="text-decoration-none">
+      <StyledCard className="h-100">
+        <AuthImage
+          imageId={imageId}
+          alt={title}
+          variant="top"
+          as={BootstrapCard.Img}
+          className="card-img-top"
+        />
         <BootstrapCard.Body>
-          <BootstrapCard.Title>{title}</BootstrapCard.Title>
-          {text && <BootstrapCard.Text>{text}</BootstrapCard.Text>}
+          <BootstrapCard.Title className="card-title">
+            {title}
+          </BootstrapCard.Title>
+          <div className="d-grid">
+            <PriceButton variant="outline-primary" as="div">
+              ${price ? price.toFixed(2) : "N/A"}
+            </PriceButton>
+          </div>
         </BootstrapCard.Body>
-      </BootstrapCard>
+      </StyledCard>
     </Link>
   );
 };
