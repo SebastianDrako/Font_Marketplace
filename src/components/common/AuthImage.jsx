@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
-import { getImageBlob } from '../../services/productService';
-import { Spinner } from 'react-bootstrap';
+import React, { useState, useEffect } from "react";
+import { productService } from "../../services/productService";
+import { Spinner } from "react-bootstrap";
 
 const AuthImage = ({ imageId, alt, ...props }) => {
   const [imageUrl, setImageUrl] = useState(null);
@@ -20,11 +20,11 @@ const AuthImage = ({ imageId, alt, ...props }) => {
       try {
         setLoading(true);
         setError(false);
-        const blob = await getImageBlob(imageId);
+        const blob = await productService.getImageBlob(imageId);
         objectUrl = URL.createObjectURL(blob);
         setImageUrl(objectUrl);
       } catch (e) {
-        console.error('Failed to fetch auth image', e);
+        console.error("Failed to fetch auth image", e);
         setError(true);
       } finally {
         setLoading(false);
@@ -42,11 +42,19 @@ const AuthImage = ({ imageId, alt, ...props }) => {
   }, [imageId]);
 
   if (loading) {
-    return <Spinner animation="border" size="sm" role="status" aria-hidden="true" />;
+    return (
+      <Spinner animation="border" size="sm" role="status" aria-hidden="true" />
+    );
   }
 
   if (error || !imageUrl) {
-    return <img src="https://placehold.co/600x400/E9ECEF/495057?text=Error" alt="Error al cargar imagen" {...props} />;
+    return (
+      <img
+        src="https://placehold.co/600x400/E9ECEF/495057?text=Error"
+        alt="Error al cargar imagen"
+        {...props}
+      />
+    );
   }
 
   return <img src={imageUrl} alt={alt} {...props} />;
