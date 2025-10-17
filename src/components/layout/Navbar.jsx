@@ -22,6 +22,7 @@ const AppNavbar = () => {
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="me-auto">
             <Nav.Link as={Link} to="/">Inicio</Nav.Link>
+            <Nav.Link as={Link} to="/catalogPage">Catalogo</Nav.Link>
           </Nav>
           <Nav>
             {isAuthenticated ? (

@@ -1,6 +1,6 @@
 
 
-const API_BASE_URL = 'https://23.95.3.178:8443';
+const API_BASE_URL = 'http://localhost:8080';
 
 const apiClient = {
   async request(method, url, data = null, config = {}) {
