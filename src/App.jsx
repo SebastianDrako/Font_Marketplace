@@ -18,6 +18,8 @@ import AddressesPage from './pages/AddressesPage';
 import OrdersPage from './pages/OrdersPage';
 import './styles/App.css';
 import CheckoutPage from './pages/CheckoutPage';
+import Catalog from "./pages/Catalog";
+import CatalogPage from './pages/CatalogPage';
 
 import AdminRoute from './components/routes/AdminRoute';
 import UserRoute from './components/routes/UserRoute';
@@ -31,8 +33,11 @@ function App() {
         <main className="flex-grow-1">
           <Routes>
             <Route path="/" element={<HomePage />} />
+            <Route path="/Catalog" element={<CatalogPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/catalog" element={<Catalog />} />
+            <Route path="/catalogPage" element={<CatalogPage />} />
             <Route path="/otp" element={<OtpPage />} />
             <Route path="/product/:id" element={<ProductPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
