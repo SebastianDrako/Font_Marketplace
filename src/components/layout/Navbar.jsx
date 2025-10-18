@@ -25,7 +25,7 @@ const AppNavbar = () => {
               Inicio
             </Nav.Link>
             <Nav.Link as={Link} to="/catalog">
-              Catalogo
+              Buscar
             </Nav.Link>
           </Nav>
           <Nav>
