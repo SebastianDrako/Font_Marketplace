@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Container, Alert, Spinner } from "react-bootstrap";
 import { useAuth } from "../hooks/useAuth";
@@ -6,6 +6,10 @@ import ProductView from "../components/common/products_view/ProductView";
 
 const ProductPage = () => {
   const { user, loading } = useAuth();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   if (loading) {
     return (

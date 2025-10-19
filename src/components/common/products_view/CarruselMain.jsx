@@ -7,9 +7,13 @@ const ZoomableImageContainer = styled.div`
   overflow: hidden;
   position: relative;
   cursor: zoom-in;
+  aspect-ratio: 1 / 1;
 
   .auth-image {
     transition: transform 0.3s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
   }
 
   &:hover .auth-image {
