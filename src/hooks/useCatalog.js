@@ -1,5 +1,20 @@
 import { useState, useEffect, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { productService } from "../services/productService";
+
+// Helper function to find category by name in a tree
+const findCategoryByName = (categories, name) => {
+  for (const category of categories) {
+    if (category.name.toLowerCase() === name.toLowerCase()) {
+      return category;
+    }
+    if (category.children && category.children.length > 0) {
+      const found = findCategoryByName(category.children, name);
+      if (found) return found;
+    }
+  }
+  return null;
+};
 
 export const useCatalog = () => {
   const [products, setProducts] = useState([]);
@@ -12,6 +27,7 @@ export const useCatalog = () => {
     totalPages: 1,
   });
   const [filters, setFilters] = useState({ q: "", categoryId: "" });
+  const location = useLocation();
 
   const fetchCategories = useCallback(async () => {
     try {
@@ -27,7 +43,8 @@ export const useCatalog = () => {
     try {
       const productsData = await productService.getProducts({
         ...filters,
-        ...pagination,
+        page: pagination.page,
+        size: pagination.size,
       });
       setProducts(productsData.products);
       setPagination((prev) => ({
@@ -39,11 +56,23 @@ export const useCatalog = () => {
     } finally {
       setLoading(false);
     }
-  }, [filters, pagination.page]);
+  }, [filters, pagination.page, pagination.size]);
 
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const categoryName = params.get("category");
+
+    if (categoryName && categories.length > 0) {
+      const category = findCategoryByName(categories, categoryName);
+      if (category) {
+        setFilters((prev) => ({ ...prev, categoryId: category.id }));
+      }
+    }
+  }, [location.search, categories]);
 
   useEffect(() => {
     fetchProducts();
