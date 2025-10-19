@@ -20,20 +20,16 @@ const HomePage = () => {
       <Carousel fade interval={3000} className="mb-5">
         {[
           {
-            src: "https://placehold.co/1200x400?text=Imagen+1",
-            alt: "Slide 1",
+            src: "/Banner1_page-0001.jpg",
+            alt: "Autentico sabor Colombiano",
           },
           {
-            src: "https://placehold.co/1200x400?text=Imagen+2",
-            alt: "Slide 2",
+            src: "/Banner 2_page-0001.jpg",
+            alt: "Autentico sabor Colombiano",
           },
           {
-            src: "https://placehold.co/1200x400?text=Imagen+3",
-            alt: "Slide 3",
-          },
-          {
-            src: "https://placehold.co/1200x400?text=Imagen+4",
-            alt: "Slide 4",
+            src: "/Vive.png",
+            alt: "Vive Colombia y su cultura gastronomica",
           },
         ].map((slide, idx) => (
           <Carousel.Item key={idx}>

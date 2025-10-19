@@ -12,8 +12,8 @@ const AppNavbar = () => {
       <Container fluid>
         <Navbar.Brand as={Link} to="/">
           <img
-            src="https://placehold.co/120x30/png?text=Logo"
-            height="30"
+            src="/Logo.png"
+            height="80"
             className="d-inline-block align-top"
             alt="Logo de la tienda"
           />
