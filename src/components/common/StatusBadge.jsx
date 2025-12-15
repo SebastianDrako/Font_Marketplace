@@ -1,5 +1,6 @@
 import React from 'react';
 import { Badge } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
 const statusMap = {
   // Payment Statuses
@@ -22,6 +23,15 @@ const statusMap = {
   DEFAULT: { variant: 'secondary', name: 'Unknown' }
 };
 
+/**
+ * A badge component to display the status of an order or payment.
+ * Automatically maps status codes to colors and labels.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {string} props.status - The status code (e.g., 'PAID', 'PENDING').
+ * @returns {JSX.Element} The rendered StatusBadge component.
+ */
 const StatusBadge = ({ status }) => {
   const details = statusMap[status?.toUpperCase()] || { variant: 'secondary', name: status };
 
@@ -30,6 +40,10 @@ const StatusBadge = ({ status }) => {
       {details.name}
     </Badge>
   );
+};
+
+StatusBadge.propTypes = {
+  status: PropTypes.string,
 };
 
 export default StatusBadge;

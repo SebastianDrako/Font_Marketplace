@@ -18,6 +18,17 @@ const CategoryOptions = ({ categories, level = 0 }) => {
   ));
 };
 
+/**
+ * Modal to creating or editing a product.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {boolean} props.show - Whether to show the modal.
+ * @param {Function} props.onHide - Callback to hide the modal.
+ * @param {Object} [props.product] - Product to edit (if null, create mode).
+ * @param {Function} props.onSave - Callback when product is saved.
+ * @returns {JSX.Element} The rendered ProductFormModal component.
+ */
 const ProductFormModal = ({ show, onHide, product, onSave }) => {
   const [formData, setFormData] = useState({});
   const [categories, setCategories] = useState([]);
@@ -50,7 +61,10 @@ const ProductFormModal = ({ show, onHide, product, onSave }) => {
     if (show) {
       fetchCategories();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show]);
 
+  useEffect(() => {
     if (product) {
       setFormData({
         name: product.name || "",

@@ -16,6 +16,12 @@ import { LinkContainer } from "react-router-bootstrap";
 import { useSelector } from "react-redux";
 import createApiClient from "../services/apiClient";
 
+/**
+ * Page to administer orders (view list, view details, update status).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AdminOrdersPage component.
+ */
 const AdminOrdersPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +60,7 @@ const AdminOrdersPage = () => {
 
   useEffect(() => {
     fetchOrders();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handleShowDetails = (order) => {

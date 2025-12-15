@@ -17,6 +17,12 @@ import {
   resetOperationStatus,
 } from "../redux/addressSlice";
 
+/**
+ * Page to manage user addresses (create, read, update, delete).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AddressesPage component.
+ */
 const AddressesPage = () => {
   const dispatch = useDispatch();
   const { addresses, loading, operationLoading, operationSuccess, operationError } = useSelector(

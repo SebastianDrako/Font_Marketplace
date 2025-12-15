@@ -11,6 +11,22 @@ import {
 import { useEffect } from "react";
 import { useAuth } from "./useAuth";
 
+/**
+ * Custom hook to manage cart state and actions.
+ *
+ * @returns {Object} An object containing cart state and functions.
+ * @property {Object|null} cart - The current cart object.
+ * @property {Array} items - The list of items in the cart.
+ * @property {boolean} loading - Whether a cart action is in progress.
+ * @property {string|null} error - Error message, if any.
+ * @property {Function} getCart - Function to refresh the cart.
+ * @property {Function} addToCart - Function to add an item to the cart.
+ * @property {Function} updateCartItem - Function to update an item's quantity.
+ * @property {Function} removeFromCart - Function to remove an item from the cart.
+ * @property {Function} clearCart - Function to clear the cart.
+ * @property {Function} applyCoupon - Function to apply a coupon.
+ * @property {Function} removeCoupon - Function to remove a coupon.
+ */
 export const useCart = () => {
   const dispatch = useDispatch();
   const { cart, loading, error } = useSelector((state) => state.cart);

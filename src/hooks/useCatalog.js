@@ -4,6 +4,12 @@ import { useLocation } from "react-router-dom";
 import { fetchProducts } from "../redux/productSlice";
 import { fetchCategories } from "../redux/categorySlice";
 
+/**
+ * Helper function to find a category by name in the category tree.
+ * @param {Array} categories - The category tree.
+ * @param {string} name - The name to search for.
+ * @returns {Object|null} The found category or null.
+ */
 const findCategoryByName = (categories, name) => {
   for (const category of categories) {
     if (category.name.toLowerCase() === name.toLowerCase()) {
@@ -17,6 +23,19 @@ const findCategoryByName = (categories, name) => {
   return null;
 };
 
+/**
+ * Custom hook to manage the product catalog state (filtering, pagination, categories).
+ *
+ * @returns {Object} An object containing catalog state and functions.
+ * @property {Array} products - The list of products.
+ * @property {Array} categories - The category tree.
+ * @property {boolean} loading - Whether products or categories are loading.
+ * @property {string|null} error - Error message, if any.
+ * @property {Object} pagination - Pagination state (page, size, totalPages).
+ * @property {Object} filters - Current filters (q, categoryId).
+ * @property {Function} handleFilterChange - Function to update filters.
+ * @property {Function} handlePageChange - Function to change the current page.
+ */
 export const useCatalog = () => {
   const dispatch = useDispatch();
   const location = useLocation();

@@ -1,6 +1,17 @@
 import React from 'react';
 import { Pagination } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
+/**
+ * A custom pagination component.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {number} props.currentPage - The current page number (0-indexed).
+ * @param {number} props.totalPages - The total number of pages.
+ * @param {Function} props.onPageChange - Callback function when a page is changed.
+ * @returns {JSX.Element} The rendered CustomPagination component.
+ */
 const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
     const isFirstPage = currentPage === 0;
     const isLastPage = currentPage === totalPages - 1;
@@ -39,6 +50,12 @@ const CustomPagination = ({ currentPage, totalPages, onPageChange }) => {
             <Pagination.Last onClick={() => handlePageChange(totalPages - 1)} disabled={isLastPage} />
         </Pagination>
     );
+};
+
+CustomPagination.propTypes = {
+    currentPage: PropTypes.number.isRequired,
+    totalPages: PropTypes.number.isRequired,
+    onPageChange: PropTypes.func.isRequired,
 };
 
 export default CustomPagination;

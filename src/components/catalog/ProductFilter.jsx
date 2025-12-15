@@ -1,6 +1,16 @@
 import React from 'react';
 import { Row, Col, Form } from 'react-bootstrap';
+import PropTypes from 'prop-types';
 
+/**
+ * Recursive component to render category options with indentation.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.categories - The list of categories.
+ * @param {number} [props.level=0] - The nesting level for indentation.
+ * @returns {Array<JSX.Element>} An array of option elements.
+ */
 const CategoryOptions = ({ categories, level = 0 }) => {
   return categories.map(category => (
     <React.Fragment key={category.id}>
@@ -14,6 +24,27 @@ const CategoryOptions = ({ categories, level = 0 }) => {
   ));
 };
 
+CategoryOptions.propTypes = {
+  categories: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    children: PropTypes.array,
+  })).isRequired,
+  level: PropTypes.number,
+};
+
+/**
+ * Component for filtering products by search query and category.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Array} props.categories - The list of categories available.
+ * @param {Object} props.filters - Current filter values.
+ * @param {string} props.filters.q - Search query.
+ * @param {string} props.filters.categoryId - Selected category ID.
+ * @param {Function} props.onFilterChange - Callback for when filters change.
+ * @returns {JSX.Element} The rendered ProductFilter component.
+ */
 const ProductFilter = ({ categories, filters, onFilterChange }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -39,6 +70,15 @@ const ProductFilter = ({ categories, filters, onFilterChange }) => {
       </Col>
     </Row>
   );
+};
+
+ProductFilter.propTypes = {
+  categories: PropTypes.array.isRequired,
+  filters: PropTypes.shape({
+    q: PropTypes.string,
+    categoryId: PropTypes.string,
+  }).isRequired,
+  onFilterChange: PropTypes.func.isRequired,
 };
 
 export default ProductFilter;

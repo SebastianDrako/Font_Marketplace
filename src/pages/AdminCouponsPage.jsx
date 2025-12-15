@@ -18,6 +18,12 @@ import {
   resetOperationStatus,
 } from "../redux/couponSlice";
 
+/**
+ * Page to administer coupons (CRUD operations).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AdminCouponsPage component.
+ */
 const AdminCouponsPage = () => {
   const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
