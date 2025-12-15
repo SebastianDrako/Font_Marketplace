@@ -7,17 +7,29 @@ import {
   Alert,
   Modal,
   Form,
-  Pagination,
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
-import { useSelector } from "react-redux";
-import { couponService } from "../services/couponService";
+import { useSelector, useDispatch } from "react-redux";
 import CustomPagination from "../components/common/CustomPagination";
+import {
+  fetchCoupons,
+  createCoupon,
+  updateCoupon,
+  resetOperationStatus,
+} from "../redux/couponSlice";
 
 const AdminCouponsPage = () => {
-  const [coupons, setCoupons] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const dispatch = useDispatch();
+  const token = useSelector((state) => state.auth.token);
+  const {
+    coupons,
+    loading,
+    error,
+    operationLoading,
+    operationSuccess,
+    operationError,
+  } = useSelector((state) => state.coupon);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [newCoupon, setNewCoupon] = useState({
     codigo: "",
@@ -31,38 +43,32 @@ const AdminCouponsPage = () => {
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [editFormData, setEditFormData] = useState({});
 
-  // Paginación
   const [currentPage, setCurrentPage] = useState(0);
-  const [totalPages, setTotalPages] = useState(0);
-
-  const token = useSelector((state) => state.auth.token);
-
-  const fetchCoupons = async (page = 0) => {
-    try {
-      setLoading(true);
-      const response = await couponService.getCoupons(token, {
-        page,
-        size: 10,
-      });
-      setCoupons(response.cupones);
-      setTotalPages(response.totalPages);
-      setCurrentPage(page);
-    } catch (err) {
-      setError("Error al cargar los cupones.");
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   useEffect(() => {
     if (token) {
-      fetchCoupons(currentPage);
+      // API currently does not support pagination in the implemented slice/service in this refactor
+      // Assuming fetchCoupons fetches all.
+      dispatch(fetchCoupons());
     }
-  }, [currentPage, token]);
+  }, [currentPage, token, dispatch]);
 
-  const handleModalClose = () => setShowCreateModal(false);
+  const handleModalClose = () => {
+    setShowCreateModal(false);
+    dispatch(resetOperationStatus());
+  };
   const handleModalShow = () => setShowCreateModal(true);
+
+  useEffect(() => {
+    if (operationSuccess) {
+      handleModalClose();
+      setShowEditModal(false);
+      dispatch(fetchCoupons());
+      dispatch(resetOperationStatus());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [operationSuccess]);
+
 
   const handleFormChange = (e) => {
     const { name, value } = e.target;
@@ -71,20 +77,13 @@ const AdminCouponsPage = () => {
 
   const handleCreateCoupon = async (e) => {
     e.preventDefault();
-    try {
-      const couponToCreate = {
-        ...newCoupon,
-        porcentajeDescuento: parseFloat(newCoupon.porcentajeDescuento),
-        usosMaximos: parseInt(newCoupon.usosMaximos, 10),
-        fechaExpiracion: new Date(newCoupon.fechaExpiracion).toISOString(),
-      };
-      await couponService.createCoupon(token, couponToCreate);
-      handleModalClose();
-      fetchCoupons(currentPage); // Recargar
-    } catch (err) {
-      console.error("Error al crear el cupón:", err);
-      // Aquí podrías mostrar un error en el modal
-    }
+    const couponToCreate = {
+      ...newCoupon,
+      porcentajeDescuento: parseFloat(newCoupon.porcentajeDescuento),
+      usosMaximos: parseInt(newCoupon.usosMaximos, 10),
+      fechaExpiracion: new Date(newCoupon.fechaExpiracion).toISOString(),
+    };
+    dispatch(createCoupon(couponToCreate));
   };
 
   const handlePageChange = (pageNumber) => {
@@ -115,20 +114,18 @@ const AdminCouponsPage = () => {
 
   const handleUpdateCoupon = async (e) => {
     e.preventDefault();
-    try {
-      const couponToUpdate = {
-        ...editFormData,
-        porcentajeDescuento: parseFloat(editFormData.porcentajeDescuento),
-        usosMaximos: parseInt(editFormData.usosMaximos, 10),
-        fechaExpiracion: new Date(editFormData.fechaExpiracion).toISOString(),
-      };
-      await couponService.updateCoupon(token, editingCoupon.id, couponToUpdate);
-      setShowEditModal(false);
-      fetchCoupons(currentPage);
-    } catch (err) {
-      console.error("Error al actualizar el cupón:", err);
-    }
+    const couponToUpdate = {
+      ...editFormData,
+      porcentajeDescuento: parseFloat(editFormData.porcentajeDescuento),
+      usosMaximos: parseInt(editFormData.usosMaximos, 10),
+      fechaExpiracion: new Date(editFormData.fechaExpiracion).toISOString(),
+    };
+    dispatch(updateCoupon({ couponId: editingCoupon.id, couponData: couponToUpdate }));
   };
+
+  const couponList = Array.isArray(coupons) ? coupons : (coupons?.cupones || []);
+  const totalPages = coupons?.totalPages || 0;
+
   return (
     <Container className="mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -144,7 +141,8 @@ const AdminCouponsPage = () => {
       </div>
 
       {loading && <Spinner animation="border" />}
-      {error && <Alert variant="danger">{error}</Alert>}
+      {error && <Alert variant="danger">{typeof error === 'string' ? error : 'Error'}</Alert>}
+      {operationError && <Alert variant="danger">{typeof operationError === 'string' ? operationError : 'Error en operación'}</Alert>}
 
       {!loading && !error && (
         <>
@@ -160,7 +158,7 @@ const AdminCouponsPage = () => {
               </tr>
             </thead>
             <tbody>
-              {(coupons || []).map((coupon) => (
+              {couponList.map((coupon) => (
                 <tr key={coupon.id}>
                   <td>{coupon.codigo}</td>
                   <td>{coupon.porcentajeDescuento.toFixed(2)}%</td>
@@ -245,8 +243,8 @@ const AdminCouponsPage = () => {
             <Button variant="secondary" onClick={handleModalClose}>
               Cancelar
             </Button>
-            <Button variant="primary" type="submit">
-              Crear
+            <Button variant="primary" type="submit" disabled={operationLoading}>
+              {operationLoading ? "Creando..." : "Crear"}
             </Button>
           </Modal.Footer>
         </Form>
@@ -317,8 +315,8 @@ const AdminCouponsPage = () => {
               >
                 Cancelar
               </Button>
-              <Button variant="primary" type="submit">
-                Guardar Cambios
+              <Button variant="primary" type="submit" disabled={operationLoading}>
+                {operationLoading ? "Guardando..." : "Guardar Cambios"}
               </Button>
             </Modal.Footer>
           </Form>

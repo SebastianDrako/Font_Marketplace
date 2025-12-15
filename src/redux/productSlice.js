@@ -2,6 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { productService } from "../services/productService";
 
 // Thunks
+
+/**
+ * Thunk to fetch a list of products.
+ */
 export const fetchProducts = createAsyncThunk(
   "product/fetchProducts",
   async ({ filters, pagination }, { getState, rejectWithValue }) => {
@@ -14,11 +18,14 @@ export const fetchProducts = createAsyncThunk(
       });
       return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
+/**
+ * Thunk to fetch detailed data for a specific product.
+ */
 export const fetchProductData = createAsyncThunk(
   "product/fetchProductData",
   async (productId, { getState, rejectWithValue }) => {
@@ -60,7 +67,29 @@ export const fetchProductData = createAsyncThunk(
 
       return { product, breadcrumbs, relatedProducts };
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+/**
+ * Thunk to fetch a product image as a blob.
+ * This thunk does NOT store the blob in Redux state to keep it serializable.
+ * Instead, it returns the blob for the component to handle (e.g., creating Object URL).
+ */
+export const fetchProductImage = createAsyncThunk(
+  "product/fetchProductImage",
+  async (imageId, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const blob = await productService.getImageBlob(token, imageId);
+      // We return the blob here. It will be available in the action payload in components
+      // if we use .unwrap().
+      // However, redux-toolkit might warn about non-serializable payload.
+      // We are suppressing these warnings in store configuration.
+      return blob;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
@@ -106,6 +135,7 @@ const productSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+    // fetchProductImage is not handled in the reducer because we don't store blobs in state.
   },
 });
 

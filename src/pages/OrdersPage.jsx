@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { orderService } from "../services/orderService";
 import {
   Button,
   Card,
@@ -8,46 +7,32 @@ import {
   Spinner,
   Badge,
 } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchMyOrders, retryPayment } from "../redux/orderSlice";
 
 const OrdersPage = () => {
-  const [orders, setOrders] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [feedback, setFeedback] = useState({ type: "", message: "" }); // For retry payment
+  const dispatch = useDispatch();
   const token = useSelector((state) => state.auth.token);
+  const { orders, loading, error } = useSelector((state) => state.order);
 
-  const fetchOrders = async () => {
-    if (!token) return;
-    try {
-      setLoading(true);
-      const response = await orderService.getMyOrders(token);
-      // Sort orders by date, newest first
-      const sortedOrders = response.data.sort(
-        (a, b) => new Date(b.orderTimestamp) - new Date(a.orderTimestamp),
-      );
-      setOrders(sortedOrders);
-    } catch {
-      setError("Error al cargar los pedidos.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const [feedback, setFeedback] = useState({ type: "", message: "" }); // For retry payment
 
   useEffect(() => {
-    fetchOrders();
-  }, [token]);
+    if (token) {
+      dispatch(fetchMyOrders());
+    }
+  }, [token, dispatch]);
 
   const handleRetryPayment = async (orderId) => {
     setFeedback({ type: "", message: "" });
     try {
-      await orderService.retryPayment(token, orderId);
+      await dispatch(retryPayment(orderId)).unwrap();
       setFeedback({
         type: "success",
         message: `Reintento de pago iniciado para el pedido #${orderId}. Actualizando...`,
       });
-      setTimeout(fetchOrders, 2000); // Refresh orders after a short delay
-    } catch {
+      setTimeout(() => dispatch(fetchMyOrders()), 2000); // Refresh orders after a short delay
+    } catch (err) { // eslint-disable-line no-unused-vars
       setFeedback({
         type: "danger",
         message: `Error al reintentar el pago para el pedido #${orderId}.`,
@@ -86,11 +71,16 @@ const OrdersPage = () => {
     }
   };
 
+  // Sort orders by date, newest first
+  const sortedOrders = [...orders].sort(
+    (a, b) => new Date(b.orderTimestamp) - new Date(a.orderTimestamp),
+  );
+
   return (
     <Card>
       <Card.Header as="h2">Mis Pedidos</Card.Header>
       <Card.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
+        {error && <Alert variant="danger">{typeof error === 'string' ? error : 'Error al cargar los pedidos'}</Alert>}
         {feedback.message && (
           <Alert variant={feedback.type}>{feedback.message}</Alert>
         )}
@@ -98,8 +88,8 @@ const OrdersPage = () => {
           <div className="text-center">
             <Spinner animation="border" />
           </div>
-        ) : orders.length > 0 ? (
-          orders.map((order) => {
+        ) : sortedOrders.length > 0 ? (
+          sortedOrders.map((order) => {
             const orderStatusInfo = getStatusInfo(order.orderStatus);
             const paymentStatusInfo = getStatusInfo(order.paymentStatus);
 

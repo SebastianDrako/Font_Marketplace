@@ -1,6 +1,15 @@
 import createApiClient from "./apiClient";
 
+/**
+ * Service for product-related operations.
+ */
 export const productService = {
+  /**
+   * Retrieves a product by its ID.
+   * @param {string} token - The authentication token.
+   * @param {string|number} productId - The ID of the product.
+   * @returns {Promise<Object>} The product data.
+   */
   async getProductById(token, productId) {
     const apiClient = createApiClient(token);
     console.log(
@@ -22,6 +31,12 @@ export const productService = {
     }
   },
 
+  /**
+   * Retrieves a category by its ID.
+   * @param {string} token - The authentication token.
+   * @param {string|number} categoryId - The ID of the category.
+   * @returns {Promise<Object>} The category data.
+   */
   async getCategoryById(token, categoryId) {
     const apiClient = createApiClient(token);
     console.log(
@@ -45,6 +60,16 @@ export const productService = {
     }
   },
 
+  /**
+   * Retrieves a list of products based on filters.
+   * @param {string} token - The authentication token.
+   * @param {Object} params - The query parameters.
+   * @param {string} [params.categoryId] - Filter by category ID.
+   * @param {string} [params.q] - Search query.
+   * @param {number} [params.page] - Page number.
+   * @param {number} [params.size] - Page size.
+   * @returns {Promise<Object>} The list of products and pagination info.
+   */
   async getProducts(token, { categoryId, q, page, size }) {
     const apiClient = createApiClient(token);
     try {
@@ -65,6 +90,11 @@ export const productService = {
     }
   },
 
+  /**
+   * Retrieves the category tree structure.
+   * @param {string} token - The authentication token.
+   * @returns {Promise<Array>} The category tree.
+   */
   async getCategoriesTree(token) {
     const apiClient = createApiClient(token);
     try {
@@ -79,6 +109,12 @@ export const productService = {
     }
   },
 
+  /**
+   * Retrieves an image as a Blob.
+   * @param {string} token - The authentication token.
+   * @param {string|number} imageId - The ID of the image.
+   * @returns {Promise<Blob>} The image data as a Blob.
+   */
   async getImageBlob(token, imageId) {
     const apiClient = createApiClient(token);
     try {

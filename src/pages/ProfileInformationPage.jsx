@@ -1,50 +1,49 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useAuth } from "../hooks/useAuth";
-import { userService } from "../services/userService";
 import { Form, Button, Card, Alert, Spinner } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { changePassword, resetPasswordChangeStatus } from "../redux/authSlice";
 
 const ProfileInformationPage = () => {
   const { user } = useAuth();
+  const dispatch = useDispatch();
+  const { passwordChangeStatus, passwordChangeError } = useSelector(
+    (state) => state.auth
+  );
+
   const [oldPassword, setOldPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(false);
-  const token = useSelector((state) => state.auth.token);
+  const [validationError, setValidationError] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  useEffect(() => {
+    if (passwordChangeStatus === "succeeded") {
+      setSuccessMessage("¡Contraseña cambiada con éxito!");
+      setOldPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      dispatch(resetPasswordChangeStatus());
+    }
+  }, [passwordChangeStatus, dispatch]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
+    setValidationError("");
+    setSuccessMessage("");
+    dispatch(resetPasswordChangeStatus());
 
     if (newPassword !== confirmPassword) {
-      setError("Las contraseñas nuevas no coinciden.");
+      setValidationError("Las contraseñas nuevas no coinciden.");
       return;
     }
 
     if (newPassword.length < 6) {
-      // Example validation
-      setError("La nueva contraseña debe tener al menos 6 caracteres.");
+      setValidationError("La nueva contraseña debe tener al menos 6 caracteres.");
       return;
     }
 
-    setLoading(true);
-    try {
-      await userService.changePassword(token, { oldPassword, newPassword });
-      setSuccess("¡Contraseña cambiada con éxito!");
-      setOldPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Error al cambiar la contraseña. Por favor, verifica tu contraseña anterior.",
-      );
-    } finally {
-      setLoading(false);
-    }
+    dispatch(changePassword({ oldPassword, newPassword }));
   };
 
   return (
@@ -62,8 +61,15 @@ const ProfileInformationPage = () => {
 
         <h4 className="mt-4">Cambiar Contraseña</h4>
         <Form onSubmit={handleSubmit}>
-          {error && <Alert variant="danger">{error}</Alert>}
-          {success && <Alert variant="success">{success}</Alert>}
+          {(validationError || passwordChangeError) && (
+            <Alert variant="danger">
+              {validationError ||
+                (typeof passwordChangeError === 'string'
+                  ? passwordChangeError
+                  : "Error al cambiar la contraseña.")}
+            </Alert>
+          )}
+          {successMessage && <Alert variant="success">{successMessage}</Alert>}
 
           <Form.Group className="mb-3" controlId="oldPassword">
             <Form.Label>Contraseña Antigua</Form.Label>
@@ -95,8 +101,12 @@ const ProfileInformationPage = () => {
             />
           </Form.Group>
 
-          <Button variant="primary" type="submit" disabled={loading}>
-            {loading ? (
+          <Button
+            variant="primary"
+            type="submit"
+            disabled={passwordChangeStatus === "loading"}
+          >
+            {passwordChangeStatus === "loading" ? (
               <Spinner
                 as="span"
                 animation="border"

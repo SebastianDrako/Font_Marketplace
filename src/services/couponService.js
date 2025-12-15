@@ -1,89 +1,59 @@
 import createApiClient from "./apiClient";
 
+/**
+ * Service for coupon-related operations.
+ */
 export const couponService = {
   /**
-   * Crea un nuevo cupón de descuento. (Rol: Admin)
-   * @param {string} token - The auth token.
-   * @param {object} couponData - Datos del cupón a crear.
-   * @param {string} couponData.codigo - El código único del cupón.
-   * @param {number} couponData.porcentajeDescuento - El porcentaje de descuento.
-   * @param {string} couponData.fechaExpiracion - Fecha en formato ISO 8601.
-   * @param {number} couponData.usosMaximos - El número máximo de usos.
-   * @returns {Promise<object>} El cupón creado.
+   * Retrieves all coupons.
+   * @param {string} token - The authentication token.
+   * @returns {Promise<Array>} List of coupons.
    */
-  createCoupon(token, couponData) {
+  async getCoupons(token) {
     const apiClient = createApiClient(token);
-    return apiClient
-      .post("/api/v1/cupones", couponData)
-      .then((res) => res.data);
+    const response = await apiClient.get("/api/v1/coupons");
+    return response.data;
   },
 
   /**
-   * Obtiene una lista paginada de cupones. (Rol: Admin)
-   * @param {string} token - The auth token.
-   * @param {object} params - Parámetros de consulta.
-   * @param {string} [params.codigo] - Filtrar por código.
-   * @param {boolean} [params.activo] - Filtrar por estado.
-   * @param {number} [params.page=0] - Número de página.
-   * @param {number} [params.size=20] - Tamaño de página.
-   * @returns {Promise<object>} La lista paginada de cupones.
+   * Creates a new coupon.
+   * @param {string} token - The authentication token.
+   * @param {Object} couponData - The coupon data.
+   * @returns {Promise<Object>} The created coupon.
    */
-  getCoupons(token, params = {}) {
+  async createCoupon(token, couponData) {
     const apiClient = createApiClient(token);
-    const query = new URLSearchParams(params).toString();
-    return apiClient.get(`/api/v1/cupones?${query}`).then((res) => res.data);
+    const response = await apiClient.post("/api/v1/coupons", couponData);
+    return response.data;
   },
 
   /**
-   * Valida un código de cupón sin aplicarlo. (Rol: User, Admin)
-   * @param {string} token - The auth token.
-   * @param {string} codigo - El código del cupón a validar.
-   * @returns {Promise<object>} El resultado de la validación.
+   * Updates an existing coupon.
+   * @param {string} token - The authentication token.
+   * @param {string|number} couponId - The ID of the coupon to update.
+   * @param {Object} couponData - The new coupon data.
+   * @returns {Promise<Object>} The updated coupon.
    */
-  validateCoupon(token, codigo) {
+  async updateCoupon(token, couponId, couponData) {
     const apiClient = createApiClient(token);
-    return apiClient
-      .post("/api/v1/cupones/validar", { codigo })
-      .then((res) => res.data);
+    const response = await apiClient.put(
+      `/api/v1/coupons/${couponId}`,
+      couponData,
+    );
+    return response.data;
   },
 
   /**
-   * Aplica un cupón al carrito de compras. (Rol: User, Admin)
-   * @param {string} token - The auth token.
-   * @param {string} codigo - El código del cupón a aplicar.
-   * @returns {Promise<object>} El carrito actualizado.
+   * Validates a coupon code.
+   * @param {string} token - The authentication token.
+   * @param {string} code - The coupon code.
+   * @returns {Promise<Object>} The validation result.
    */
-  applyCouponToCart(token, codigo) {
+  async validateCoupon(token, code) {
     const apiClient = createApiClient(token);
-    return apiClient
-      .post("/api/v1/cart/cupon", { codigo })
-      .then((res) => res.data);
-  },
-
-  /**
-   * Quita el cupón aplicado del carrito. (Rol: User, Admin)
-   * @param {string} token - The auth token.
-   * @returns {Promise<object>} El carrito actualizado.
-   */
-  removeCouponFromCart(token) {
-    const apiClient = createApiClient(token);
-    // Para quitar, se envía un código vacío.
-    return apiClient
-      .post("/api/v1/cart/cupon", { codigo: "" })
-      .then((res) => res.data);
-  },
-
-  /**
-   * Actualiza un cupón existente. (Rol: Admin)
-   * @param {string} token - The auth token.
-   * @param {number} couponId - El ID del cupón a actualizar.
-   * @param {object} couponData - Los datos a actualizar.
-   * @returns {Promise<object>} El cupón actualizado.
-   */
-  updateCoupon(token, couponId, couponData) {
-    const apiClient = createApiClient(token);
-    return apiClient
-      .put(`/api/v1/cupones/${couponId}`, couponData)
-      .then((res) => res.data);
+    const response = await apiClient.get(
+      `/api/v1/coupons/validate?code=${code}`,
+    );
+    return response.data;
   },
 };
