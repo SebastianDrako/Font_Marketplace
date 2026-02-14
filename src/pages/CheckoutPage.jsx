@@ -1,11 +1,11 @@
 // src/pages/CheckoutPage.jsx
 import React, { useEffect, useState } from "react";
-import { orderService } from "../services/orderService";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 import { useCart } from "../hooks/useCart";
-import { addressService } from "../services/addressService";
+import { fetchAddresses, createAddress } from "../redux/addressSlice";
+import { createOrder } from "../redux/orderSlice";
 
 // --- estados iniciales ---
 const initialShipping = {
@@ -56,42 +56,37 @@ export default function CheckoutPage() {
   const [shipping, setShipping] = useState(initialShipping);
   const [payment, setPayment] = useState(initialPayment);
   const [terms, setTerms] = useState(false);
-  const [placing, setPlacing] = useState(false);
   const [orderId, setOrderId] = useState(null);
 
   const {
     cart, // El objeto completo del carrito
     items: ctxCart, // El array de items
-    loading: cartLoading,
     clearCart,
   } = useCart();
 
   const token = useSelector((state) => state.auth.token);
   const totalToPay = cart?.total || 0;
-  const totalItems = cart?.items?.length || 0;
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   // Direcciones guardadas
-  const [addresses, setAddresses] = useState([]);
+  const addresses = useSelector((state) => state.address.addresses);
+  const operationLoading = useSelector((state) => state.order.operationLoading);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [isNewAddress, setIsNewAddress] = useState(false);
 
-  const fetchAddresses = async () => {
-    if (!token) return;
-    try {
-      const response = await addressService.getAddresses(token);
-      setAddresses(response.data);
-      if (response.data.length > 0) {
-        setSelectedAddressId(response.data[0].addressId);
-      }
-    } catch (error) {
-      console.error("Error fetching addresses:", error);
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAddresses());
     }
-  };
+  }, [token, dispatch]);
 
   useEffect(() => {
-    fetchAddresses();
-  }, [token]);
+    if (addresses.length > 0 && !selectedAddressId) {
+      setSelectedAddressId(addresses[0].id); // Assuming the id field is 'id'
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [addresses]);
 
   useEffect(() => {
     if (selectedAddressId === "new") {
@@ -99,7 +94,7 @@ export default function CheckoutPage() {
       setShipping(initialShipping);
     } else {
       setIsNewAddress(false);
-      const a = addresses.find((x) => x.addressId === selectedAddressId);
+      const a = addresses.find((x) => x.id === selectedAddressId);
       if (!a) return;
       setShipping({
         name: a.name || "",
@@ -113,8 +108,8 @@ export default function CheckoutPage() {
 
   const handleSaveAddress = async () => {
     try {
-      await addressService.createAddress(token, shipping);
-      await fetchAddresses();
+      await dispatch(createAddress(shipping)).unwrap();
+      await dispatch(fetchAddresses());
       setIsNewAddress(false);
     } catch {
       alert("Error al guardar la dirección.");
@@ -162,7 +157,7 @@ export default function CheckoutPage() {
       return;
     }
     if (!terms) return alert("Debes aceptar los términos.");
-    setPlacing(true);
+
     try {
       const orderDetails = {
         addressId: selectedAddressId,
@@ -173,14 +168,12 @@ export default function CheckoutPage() {
           price: item.price,
         })),
       };
-      const response = await orderService.createOrder(token, orderDetails);
-      setOrderId(response.data.orderId);
+      const response = await dispatch(createOrder(orderDetails)).unwrap();
+      setOrderId(response.id); // Assuming response has id
       clearCart();
       navigate("/profile/orders");
     } catch {
       alert("Error al procesar el pedido. Por favor, inténtalo de nuevo.");
-    } finally {
-      setPlacing(false);
     }
   };
 
@@ -196,12 +189,12 @@ export default function CheckoutPage() {
 
       <div id="saved-addresses" className="p-3">
         {addresses.map((a) => {
-          const active = selectedAddressId === a.addressId;
+          const active = selectedAddressId === a.id;
           return (
             <div
-              key={a.addressId}
+              key={a.id}
               role="button"
-              onClick={() => handleSelectAddress(a.addressId)}
+              onClick={() => handleSelectAddress(a.id)}
               className={`d-flex align-items-start gap-2 w-100 p-2 mb-2 border rounded ${active ? "border-primary" : "border-secondary-subtle"}`}
               style={{ cursor: "pointer" }}
             >
@@ -210,7 +203,7 @@ export default function CheckoutPage() {
                 name="savedAddress"
                 className="mt-1"
                 checked={active}
-                onChange={() => handleSelectAddress(a.addressId)}
+                onChange={() => handleSelectAddress(a.id)}
               />
               <div>
                 <div>
@@ -561,10 +554,10 @@ export default function CheckoutPage() {
                     <button
                       type="button"
                       className="btn btn-primary"
-                      disabled={placing}
+                      disabled={operationLoading}
                       onClick={placeOrder}
                     >
-                      {placing ? "Procesando…" : "Pagar ahora"}
+                      {operationLoading ? "Procesando…" : "Pagar ahora"}
                     </button>
                   </div>
                 </div>

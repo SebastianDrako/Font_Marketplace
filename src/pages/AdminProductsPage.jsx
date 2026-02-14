@@ -14,6 +14,12 @@ import { useSelector } from "react-redux";
 import createApiClient from "../services/apiClient";
 import ProductFormModal from "./ProductFormModal";
 
+/**
+ * Page to administer products (CRUD operations).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AdminProductsPage component.
+ */
 const AdminProductsPage = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -51,6 +57,7 @@ const AdminProductsPage = () => {
 
   useEffect(() => {
     fetchProducts(page);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page, token]);
 
   const handleShowDeleteModal = (product) => {

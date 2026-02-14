@@ -1,51 +1,68 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import createApiClient from "../services/apiClient";
+import { userService } from "../services/userService";
 
 // Async Thunks
+
+/**
+ * Thunk to log in a user.
+ */
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
   async ({ email, password }, { rejectWithValue }) => {
     try {
-      const apiClient = createApiClient();
-      const response = await apiClient.post("/api/v1/auth/authenticate", {
-        email,
-        password,
-      });
-      const { access_token } = response.data;
-      return access_token;
+      const data = await userService.login(email, password);
+      return data.access_token;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
+/**
+ * Thunk to register a new user.
+ */
 export const registerUser = createAsyncThunk(
   "auth/registerUser",
   async ({ firstName, lastName, mail, passkey }, { rejectWithValue }) => {
     try {
-      const apiClient = createApiClient();
-      await apiClient.post("/api/v1/auth/register", {
-        firstName,
-        lastName,
-        mail,
-        passkey,
-      });
+      await userService.register({ firstName, lastName, mail, passkey });
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
 
+/**
+ * Thunk to fetch the current user's profile.
+ */
 export const fetchUser = createAsyncThunk(
   "auth/fetchUser",
   async (_, { getState, rejectWithValue }) => {
     try {
       const token = getState().auth.token;
-      const apiClient = createApiClient(token);
-      const response = await apiClient.get("/api/v1/auth/me");
-      return response.data;
+      const data = await userService.getCurrentUser(token);
+      return data;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
+    }
+  },
+);
+
+/**
+ * Thunk to change the user's password.
+ */
+export const changePassword = createAsyncThunk(
+  "auth/changePassword",
+  async ({ oldPassword, newPassword }, { getState, rejectWithValue }) => {
+    try {
+      const token = getState().auth.token;
+      const response = await userService.changePassword(token, {
+        oldPassword,
+        newPassword,
+      });
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );
@@ -56,6 +73,8 @@ const initialState = {
   loading: false,
   error: null,
   isAuthenticated: false,
+  passwordChangeStatus: "idle", // idle, loading, succeeded, failed
+  passwordChangeError: null,
 };
 
 const authSlice = createSlice({
@@ -66,6 +85,12 @@ const authSlice = createSlice({
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
+      state.passwordChangeStatus = "idle";
+      state.passwordChangeError = null;
+    },
+    resetPasswordChangeStatus: (state) => {
+      state.passwordChangeStatus = "idle";
+      state.passwordChangeError = null;
     },
   },
   extraReducers: (builder) => {
@@ -111,10 +136,22 @@ const authSlice = createSlice({
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
+      })
+      // Change Password
+      .addCase(changePassword.pending, (state) => {
+        state.passwordChangeStatus = "loading";
+        state.passwordChangeError = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.passwordChangeStatus = "succeeded";
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.passwordChangeStatus = "failed";
+        state.passwordChangeError = action.payload;
       });
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, resetPasswordChangeStatus } = authSlice.actions;
 
 export default authSlice.reducer;

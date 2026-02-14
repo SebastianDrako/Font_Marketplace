@@ -1,6 +1,13 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
+/**
+ * The application footer component.
+ * Displays company information, useful links, and contact details.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Footer component.
+ */
 const Footer = () => {
   return (
     <footer className="bg-dark text-white pt-5 pb-4">

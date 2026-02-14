@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
-import { productService } from "../../services/productService";
+import { useDispatch } from "react-redux";
+import { fetchProductImage } from "../../redux/productSlice";
 import { Spinner } from "react-bootstrap";
 
 const AuthImage = ({ imageId, alt, ...props }) => {
   const [imageUrl, setImageUrl] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
-  const token = useSelector((state) => state.auth.token);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     if (!imageId) {
@@ -22,7 +22,8 @@ const AuthImage = ({ imageId, alt, ...props }) => {
       try {
         setLoading(true);
         setError(false);
-        const blob = await productService.getImageBlob(token, imageId);
+        // Dispatch the thunk and unwrap the result (the blob)
+        const blob = await dispatch(fetchProductImage(imageId)).unwrap();
         objectUrl = URL.createObjectURL(blob);
         setImageUrl(objectUrl);
       } catch (e) {
@@ -35,13 +36,13 @@ const AuthImage = ({ imageId, alt, ...props }) => {
 
     fetchImage();
 
-    // Función de limpieza para revocar la URL y liberar memoria
+    // Cleanup function to revoke URL and free memory
     return () => {
       if (objectUrl) {
         URL.revokeObjectURL(objectUrl);
       }
     };
-  }, [imageId, token]);
+  }, [imageId, dispatch]);
 
   if (loading) {
     return (

@@ -15,6 +15,12 @@ import { useAuth } from "../hooks/useAuth";
 import { useSelector } from "react-redux";
 import createApiClient from "../services/apiClient";
 
+/**
+ * Page to administer users (view, edit, promote/demote, OTP).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AdminUsersPage component.
+ */
 const AdminUsersPage = () => {
   const { user: currentUser } = useAuth();
   const [users, setUsers] = useState([]);
@@ -53,6 +59,7 @@ const AdminUsersPage = () => {
 
   useEffect(() => {
     fetchUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token]);
 
   const handleCloseOtpModal = () => {

@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { addressService } from "../services/addressService";
 import {
   Button,
   Card,
@@ -9,12 +8,28 @@ import {
   Modal,
   Form,
 } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import {
+  fetchAddresses,
+  createAddress,
+  updateAddress,
+  deleteAddress,
+  resetOperationStatus,
+} from "../redux/addressSlice";
 
+/**
+ * Page to manage user addresses (create, read, update, delete).
+ *
+ * @component
+ * @returns {JSX.Element} The rendered AddressesPage component.
+ */
 const AddressesPage = () => {
-  const [addresses, setAddresses] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const { addresses, loading, operationLoading, operationSuccess, operationError } = useSelector(
+    (state) => state.address
+  );
+  const token = useSelector((state) => state.auth.token);
+
   const [showModal, setShowModal] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState(null);
   const [formData, setFormData] = useState({
@@ -24,24 +39,27 @@ const AddressesPage = () => {
     others: "",
     name: "",
   });
-  const token = useSelector((state) => state.auth.token);
+  const [localError, setLocalError] = useState("");
 
-  const fetchAddresses = async () => {
-    if (!token) return;
-    try {
-      setLoading(true);
-      const response = await addressService.getAddresses(token);
-      setAddresses(response.data);
-    } catch {
-      setError("Error al cargar las direcciones.");
-    } finally {
-      setLoading(false);
+  useEffect(() => {
+    if (token) {
+      dispatch(fetchAddresses());
     }
+  }, [token, dispatch]);
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setSelectedAddress(null);
+    setLocalError("");
+    dispatch(resetOperationStatus());
   };
 
   useEffect(() => {
-    fetchAddresses();
-  }, [token]);
+    if (operationSuccess) {
+      handleCloseModal();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [operationSuccess]);
 
   const handleFormChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -55,30 +73,22 @@ const AddressesPage = () => {
         : { postalCode: "", street: "", apt: "", others: "", name: "" },
     );
     setShowModal(true);
-  };
-
-  const handleCloseModal = () => {
-    setShowModal(false);
-    setSelectedAddress(null);
-    setError("");
+    setLocalError("");
   };
 
   const handleFormSubmit = async (e) => {
     e.preventDefault();
     try {
       if (selectedAddress) {
-        await addressService.updateAddress(
-          token,
-          selectedAddress.addressId,
-          formData,
-        );
+        await dispatch(updateAddress({
+          addressId: selectedAddress.id,
+          addressData: formData
+        })).unwrap();
       } else {
-        await addressService.createAddress(token, formData);
+        await dispatch(createAddress(formData)).unwrap();
       }
-      fetchAddresses();
-      handleCloseModal();
-    } catch {
-      setError("Error al guardar la dirección.");
+    } catch (err) {
+      setLocalError(err.message || "Error al guardar la dirección.");
     }
   };
 
@@ -87,10 +97,9 @@ const AddressesPage = () => {
       window.confirm("¿Estás seguro de que quieres eliminar esta dirección?")
     ) {
       try {
-        await addressService.deleteAddress(token, addressId);
-        fetchAddresses();
-      } catch {
-        setError("Error al eliminar la dirección.");
+        await dispatch(deleteAddress(addressId)).unwrap();
+      } catch (err) { // eslint-disable-line no-unused-vars
+        setLocalError("Error al eliminar la dirección.");
       }
     }
   };
@@ -99,7 +108,9 @@ const AddressesPage = () => {
     <Card>
       <Card.Header as="h2">Mis Direcciones</Card.Header>
       <Card.Body>
-        {error && <Alert variant="danger">{error}</Alert>}
+        {operationError && <Alert variant="danger">{typeof operationError === 'string' ? operationError : 'Error en la operación'}</Alert>}
+        {localError && <Alert variant="danger">{localError}</Alert>}
+
         <Button
           variant="primary"
           onClick={() => handleShowModal()}
@@ -113,7 +124,7 @@ const AddressesPage = () => {
           <ListGroup>
             {addresses.map((addr) => (
               <ListGroup.Item
-                key={addr.addressId}
+                key={addr.id} // Assuming ID field is 'id'
                 className="d-flex justify-content-between align-items-center"
               >
                 <div>
@@ -141,7 +152,7 @@ const AddressesPage = () => {
                   <Button
                     variant="outline-danger"
                     size="sm"
-                    onClick={() => handleDelete(addr.addressId)}
+                    onClick={() => handleDelete(addr.id)}
                   >
                     Eliminar
                   </Button>
@@ -161,7 +172,8 @@ const AddressesPage = () => {
           </Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          {error && <Alert variant="danger">{error}</Alert>}
+          {operationError && <Alert variant="danger">{typeof operationError === 'string' ? operationError : 'Error al guardar'}</Alert>}
+           {localError && <Alert variant="danger">{localError}</Alert>}
           <Form onSubmit={handleFormSubmit}>
             <Form.Group className="mb-3" controlId="name">
               <Form.Label>
@@ -214,8 +226,8 @@ const AddressesPage = () => {
                 onChange={handleFormChange}
               />
             </Form.Group>
-            <Button variant="primary" type="submit">
-              Guardar Dirección
+            <Button variant="primary" type="submit" disabled={operationLoading}>
+              {operationLoading ? "Guardando..." : "Guardar Dirección"}
             </Button>
           </Form>
         </Modal.Body>

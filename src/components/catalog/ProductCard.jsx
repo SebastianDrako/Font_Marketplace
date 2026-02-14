@@ -3,6 +3,7 @@ import { Card as BootstrapCard, Button } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import AuthImage from '../common/AuthImage';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 
 const StyledCard = styled(BootstrapCard)`
   transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
@@ -37,6 +38,18 @@ const PriceButton = styled(Button)`
   font-size: 1.1rem;
 `;
 
+/**
+ * Component to display a single product in a card format.
+ *
+ * @component
+ * @param {Object} props - The component props.
+ * @param {Object} props.product - The product data.
+ * @param {string|number} props.product.id - The product ID.
+ * @param {string} props.product.name - The product name.
+ * @param {number} props.product.price - The product price.
+ * @param {Array<string|number>} [props.product.imageIds] - Array of image IDs.
+ * @returns {JSX.Element} The rendered ProductCard component.
+ */
 const ProductCard = ({ product }) => {
   const imageId = product.imageIds && product.imageIds.length > 0 ? product.imageIds[0] : null;
 
@@ -55,6 +68,15 @@ const ProductCard = ({ product }) => {
       </StyledCard>
     </Link>
   );
+};
+
+ProductCard.propTypes = {
+  product: PropTypes.shape({
+    id: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+    name: PropTypes.string.isRequired,
+    price: PropTypes.number,
+    imageIds: PropTypes.arrayOf(PropTypes.oneOfType([PropTypes.string, PropTypes.number])),
+  }).isRequired,
 };
 
 export default ProductCard;

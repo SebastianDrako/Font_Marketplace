@@ -1,3 +1,9 @@
+/**
+ * Calculates cart totals including subtotal, taxes, and total items.
+ *
+ * @param {Array|Object} cartLike - The cart object or array of items.
+ * @returns {Object} An object containing the calculated totals: { items, subtotal, discounts, taxes, total, totalItems }.
+ */
 export function calcTotals(cartLike) {
   const items = Array.isArray(cartLike)
     ? cartLike

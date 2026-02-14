@@ -4,6 +4,13 @@ import { Navbar, Nav, Container, NavDropdown } from "react-bootstrap";
 import { useAuth } from "../../hooks/useAuth.jsx";
 import CartWidget from "../common/CartWidget.jsx";
 
+/**
+ * The main application navigation bar.
+ * Handles navigation links, authentication status display, and user dropdown menus.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered Navbar component.
+ */
 const AppNavbar = () => {
   const { isAuthenticated, user, logout } = useAuth();
 

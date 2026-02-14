@@ -2,6 +2,10 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import { productService } from "../services/productService";
 
 // Thunks
+
+/**
+ * Thunk to fetch the category tree.
+ */
 export const fetchCategories = createAsyncThunk(
   "category/fetchCategories",
   async (_, { getState, rejectWithValue }) => {
@@ -10,7 +14,7 @@ export const fetchCategories = createAsyncThunk(
       const response = await productService.getCategoriesTree(token);
       return response;
     } catch (error) {
-      return rejectWithValue(error.response.data);
+      return rejectWithValue(error.response?.data || error.message);
     }
   },
 );

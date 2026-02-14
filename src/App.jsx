@@ -25,6 +25,13 @@ import AdminRoute from "./components/routes/AdminRoute";
 import UserRoute from "./components/routes/UserRoute";
 import { Navigate } from "react-router-dom";
 
+/**
+ * The root component of the application.
+ * Sets up the router and defines the main application layout and routes.
+ *
+ * @component
+ * @returns {JSX.Element} The rendered App component.
+ */
 function App() {
   return (
     <Router>
@@ -41,6 +48,7 @@ function App() {
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/cart" element={<CartPage />} />
 
+            {/* Protected Routes for Admin */}
             <Route element={<AdminRoute />}>
               <Route path="/admin" element={<AdminPage />} />
               <Route path="/admin/users" element={<AdminUsersPage />} />
@@ -49,6 +57,7 @@ function App() {
               <Route path="/admin/coupons" element={<AdminCouponsPage />} />
             </Route>
 
+            {/* Protected Routes for User */}
             <Route element={<UserRoute />}>
               <Route path="/profile" element={<ProfilePage />}>
                 <Route index element={<Navigate to="info" replace />} />
